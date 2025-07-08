@@ -10,12 +10,12 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="relative h-[60vh] md:h-[70vh] w-full flex items-center justify-center text-center text-white">
         <Image
-          src="https://placehold.co/1920x1080.png"
-          alt="Campo de avicultura"
+          src="https://www.agrimidia.com.br/wp-content/plugins/seox-image-magick/imagick_convert.php?width=1024&height=576&format=.jpg&quality=91&imagick=/wp-content/uploads/2023/12/frango_corte-1024x576.jpg"
+          alt="Cortes de frango"
           layout="fill"
           objectFit="cover"
           className="absolute z-0 brightness-50"
-          data-ai-hint="chicken farm"
+          data-ai-hint="chicken cuts"
         />
         <div className="relative z-10 p-4 animate-fade-in-up">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight drop-shadow-lg">
