@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Shield } from "lucide-react";
-import OptimizerClient from "./OptimizerClient";
 import AdminLogin from "./AdminLogin";
+import ProductManager from "./ProductManager";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,11 +25,11 @@ export default function AdminPage() {
             <Shield className="h-10 w-10 text-primary" />
             <div>
                 <h1 className="text-4xl font-bold">Painel de Administração</h1>
-                <p className="text-muted-foreground">Gerenciamento de conteúdo com otimização por IA.</p>
+                <p className="text-muted-foreground">Gerenciamento de produtos cadastrados no site.</p>
             </div>
         </div>
         
-        <OptimizerClient />
+        <ProductManager />
 
       </div>
     </div>

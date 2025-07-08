@@ -76,26 +76,3 @@ export const footerContent = {
   address: "Rua Sizenando Carneiro Leão 10, Carpina - PE, Brasil",
   contact: "Telefone: (81) 3621-1544 | Email: contato@frangodourado.com.br",
 };
-
-export const pageContentsForAI = {
-  home: {
-    title: homePageContent.title,
-    description: homePageContent.description,
-  },
-  about: {
-    title: aboutPageContent.title,
-    description: aboutPageContent.history1,
-  },
-  products: {
-    title: productsPageContent.title,
-    description: productsPageContent.description,
-  },
-  quality: {
-    title: qualityPageContent.title,
-    description: qualityPageContent.intro,
-  },
-  contact: {
-    title: contactPageContent.title,
-    description: contactPageContent.intro,
-  },
-};
