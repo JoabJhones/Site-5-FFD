@@ -52,7 +52,7 @@ export default function AboutManager() {
   useEffect(() => {
     const fetchContent = async () => {
         setIsLoading(true);
-        const content = await getPageContent('about');
+        const content = await getPageContent('sobre');
         if (content) {
             form.reset(content);
         }
@@ -91,7 +91,7 @@ export default function AboutManager() {
   };
 
   const onSubmit = async (values: z.infer<typeof aboutSchema>) => {
-    const result = await updatePageContent('about', values);
+    const result = await updatePageContent('sobre', values);
     if(result.success) {
         toast({
             title: "Página 'Sobre Nós' Atualizada!",

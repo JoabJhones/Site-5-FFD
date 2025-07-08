@@ -13,7 +13,7 @@ import MessagesManager from "./MessagesManager";
 import FooterManager from "./FooterManager";
 import { Button } from "@/components/ui/button";
 
-type ActiveManager = 'products' | 'about' | 'home' | 'quality' | 'contact' | 'messages' | 'footer';
+type ActiveManager = 'products' | 'sobre' | 'home' | 'quality' | 'contact' | 'messages' | 'footer';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,7 +43,7 @@ export default function AdminPage() {
                     <Home className="mr-2 h-4 w-4" />
                     Gerenciar Início
                 </Button>
-                <Button onClick={() => setActiveManager('about')} variant={activeManager === 'about' ? 'default' : 'outline'}>
+                <Button onClick={() => setActiveManager('sobre')} variant={activeManager === 'sobre' ? 'default' : 'outline'}>
                     <Settings className="mr-2 h-4 w-4" />
                     Gerenciar Sobre Nós
                 </Button>
@@ -72,7 +72,7 @@ export default function AdminPage() {
         
         <div className="mt-8">
           {activeManager === 'home' && <HomeManager />}
-          {activeManager === 'about' && <AboutManager />}
+          {activeManager === 'sobre' && <AboutManager />}
           {activeManager === 'products' && <ProductManager />}
           {activeManager === 'quality' && <QualityManager />}
           {activeManager === 'contact' && <ContactManager />}
