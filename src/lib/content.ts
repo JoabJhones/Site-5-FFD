@@ -24,6 +24,8 @@ export const aboutPageContent = {
   title: "Sobre o Frigorífico Frango Dourado",
   history1: "Fundado em 1998, o Frigorífico Frango Dourado Ltda. nasceu da paixão pela avicultura e do desejo de oferecer produtos de carne de frango da mais alta qualidade. Desde o início, nossa missão tem sido clara: levar sabor, frescor e confiança à mesa de cada família brasileira.",
   history2: "Ao longo dos anos, crescemos e nos modernizamos, investindo em tecnologia de ponta e em uma equipe dedicada. Nossas instalações seguem os mais rigorosos padrões de higiene e segurança alimentar, garantindo que cada etapa do processo, da criação ao abate e distribuição, seja realizada com excelência.",
+  image: "https://placehold.co/500x400.png",
+  imageHint: "company history",
   values: [
     { title: "Qualidade Inquestionável", description: "Compromisso com a excelência em todos os nossos produtos e processos." },
     { title: "Respeito e Ética", description: "Atuamos com transparência, responsabilidade e respeito aos nossos colaboradores, clientes e meio ambiente." },
@@ -76,3 +78,26 @@ export const footerContent = {
   address: "Rua Sizenando Carneiro Leão 10, Carpina - PE, Brasil",
   contact: "Telefone: (81) 3621-1544 | Email: contato@frangodourado.com.br",
 };
+
+export const pageContentsForAI = {
+  home: {
+    title: homePageContent.title,
+    description: homePageContent.description,
+  },
+  sobre: {
+    title: aboutPageContent.title,
+    description: `${aboutPageContent.history1} ${aboutPageContent.history2}`,
+  },
+  products: {
+    title: productsPageContent.title,
+    description: productsPageContent.description,
+  },
+  quality: {
+    title: qualityPageContent.title,
+    description: qualityPageContent.intro,
+  },
+  contact: {
+    title: contactPageContent.title,
+    description: contactPageContent.intro,
+  }
+}

@@ -27,12 +27,12 @@ export default function SobreNosPage() {
         </div>
         <div className="flex justify-center">
           <Image
-            src="https://placehold.co/500x400.png"
+            src={aboutPageContent.image}
             alt="Nossa História"
             width={500}
             height={400}
             className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500"
-            data-ai-hint="company history"
+            data-ai-hint={aboutPageContent.imageHint}
           />
         </div>
       </div>

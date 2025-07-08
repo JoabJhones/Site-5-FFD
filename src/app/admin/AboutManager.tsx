@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,6 +13,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { PlusCircle, Trash2, Save } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const valueSchema = z.object({
   title: z.string().min(3, { message: 'O título deve ter pelo menos 3 caracteres.' }),
@@ -23,31 +26,60 @@ const aboutSchema = z.object({
   title: z.string().min(10, { message: 'O título principal deve ter pelo menos 10 caracteres.' }),
   history1: z.string().min(20, { message: 'O primeiro parágrafo da história deve ter pelo menos 20 caracteres.' }),
   history2: z.string().min(20, { message: 'O segundo parágrafo da história deve ter pelo menos 20 caracteres.' }),
+  image: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).min(1, { message: 'A imagem é obrigatória.' }),
+  imageHint: z.string().min(2, { message: 'A dica de IA é necessária.' }),
   values: z.array(valueSchema),
 });
 
 export default function AboutManager() {
   const { toast } = useToast();
   const [aboutData, setAboutData] = useState(aboutPageContent);
+  const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof aboutSchema>>({
     resolver: zodResolver(aboutSchema),
     defaultValues: aboutData,
   });
-
+  
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "values",
   });
+  
+  const imageValue = form.watch('image');
+  
+  useEffect(() => {
+    if (imageValue && (imageValue.startsWith('http') || imageValue.startsWith('data:'))) {
+      setImagePreview(imageValue);
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageValue]);
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        form.setValue('image', dataUri, { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      form.setValue('image', '', { shouldValidate: true });
+    }
+  };
 
   const onSubmit = (values: z.infer<typeof aboutSchema>) => {
     setAboutData(values);
+    // Note: In a real app, you would need to update the content source.
+    // Here we are just updating the local state which will not persist.
+    // For the prototype, we can manually update lib/content.ts if needed.
     toast({
       title: "Página 'Sobre' Atualizada!",
       description: "O conteúdo da página 'Sobre Nós' foi salvo com sucesso.",
     });
-    // Em uma aplicação real, você enviaria esses dados para um servidor/banco de dados.
-    // Para este protótipo, as alterações são salvas apenas localmente.
   };
 
   return (
@@ -95,6 +127,75 @@ export default function AboutManager() {
                   <FormLabel className="text-lg font-semibold">História (Parágrafo 2)</FormLabel>
                   <FormControl>
                     <Textarea rows={5} placeholder="Segundo parágrafo da história da empresa..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-2">
+                <FormLabel className="text-lg font-semibold">Imagem da Página</FormLabel>
+                <RadioGroup
+                    value={uploadType}
+                    onValueChange={(v: 'url' | 'local') => {
+                        setUploadType(v);
+                        form.setValue('image', '', { shouldValidate: true });
+                    }}
+                    className="flex space-x-4"
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="url" id="img-url" />
+                        <Label htmlFor="img-url">Via URL</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="local" id="img-local" />
+                        <Label htmlFor="img-local">Upload Local</Label>
+                    </div>
+                </RadioGroup>
+                
+                <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                {uploadType === 'url' ? (
+                                    <Input placeholder="https://exemplo.com/imagem.png" {...field} />
+                                ) : (
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageFileChange}
+                                        className="file:text-primary file:font-semibold"
+                                    />
+                                )}
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {imagePreview && (
+                    <div className="mt-2 p-2 border rounded-lg flex justify-center bg-muted/50">
+                        <Image
+                            src={imagePreview}
+                            alt="Pré-visualização da imagem"
+                            width={150}
+                            height={150}
+                            className="rounded-md border object-contain"
+                        />
+                    </div>
+                )}
+              </div>
+
+            <FormField
+              control={form.control}
+              name="imageHint"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dica de IA (para imagem)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: company history" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
