@@ -2,7 +2,7 @@
 
 import { Resend } from 'resend';
 import { z } from 'zod';
-import { messagesDB, markAsReplied } from '@/lib/messagesStore';
+import { getMessages as getMessagesFromDB, markAsReplied } from '@/lib/messagesStore';
 import type { ReceivedMessage } from '@/lib/messagesStore';
 
 const replySchema = z.object({
@@ -41,18 +41,17 @@ export async function handleReplySubmit(values: z.infer<typeof replySchema>) {
             `,
         });
 
-        // Marca a mensagem como respondida em nosso "banco de dados" falso
-        markAsReplied(parsed.data.messageId, parsed.data.html);
+        // Marca a mensagem como respondida no Firestore
+        await markAsReplied(parsed.data.messageId, parsed.data.html);
 
         return { success: true };
     } catch(error) {
-        console.error("Erro ao enviar email:", error);
-        return { success: false, error: 'Ocorreu um erro ao enviar o e-mail.' };
+        console.error("Erro ao enviar email ou atualizar DB:", error);
+        return { success: false, error: 'Ocorreu um erro ao enviar o e-mail ou ao atualizar o banco de dados.' };
     }
 }
 
 export async function getMessages(): Promise<ReceivedMessage[]> {
-  // Em uma aplicação real, aqui você buscaria os dados de um banco.
-  // Para o protótipo, apenas retornamos a nossa store em memória.
-  return messagesDB;
+  // Busca os dados do Firestore através da nossa store
+  return await getMessagesFromDB();
 }
