@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -39,13 +39,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from "@/hooks/use-toast";
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 type Product = typeof productsPageContent.products[0];
 
 const productSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
   description: z.string().min(10, { message: 'A descrição deve ter pelo menos 10 caracteres.' }),
-  image: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }),
+  image: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).min(1, { message: 'A imagem é obrigatória.' }),
   hint: z.string().min(2, { message: 'A dica de IA é necessária.' }),
 });
 
@@ -54,6 +56,8 @@ export default function ProductManager() {
   const [products, setProducts] = useState<Product[]>(productsPageContent.products);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
@@ -65,15 +69,41 @@ export default function ProductManager() {
     },
   });
 
+  const imageValue = form.watch('image');
+
+  useEffect(() => {
+    if (imageValue && (imageValue.startsWith('http') || imageValue.startsWith('data:'))) {
+      setImagePreview(imageValue);
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageValue]);
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        form.setValue('image', dataUri, { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      form.setValue('image', '', { shouldValidate: true });
+    }
+  };
+
   const handleAddNew = () => {
     setEditingProduct(null);
     form.reset({ name: '', description: '', image: '', hint: ''});
+    setUploadType('url');
     setIsDialogOpen(true);
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     form.reset(product);
+    setUploadType('url');
     setIsDialogOpen(true);
   };
 
@@ -210,19 +240,62 @@ export default function ProductManager() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>URL da Imagem</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://exemplo.com/imagem.png" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              
+              <div className="space-y-2">
+                <FormLabel>Imagem do Produto</FormLabel>
+                <RadioGroup
+                    value={uploadType}
+                    onValueChange={(v: 'url' | 'local') => {
+                        setUploadType(v);
+                        form.setValue('image', '', { shouldValidate: true });
+                    }}
+                    className="flex space-x-4"
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="url" id="img-url" />
+                        <Label htmlFor="img-url">Via URL</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="local" id="img-local" />
+                        <Label htmlFor="img-local">Upload Local</Label>
+                    </div>
+                </RadioGroup>
+                
+                <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                {uploadType === 'url' ? (
+                                    <Input placeholder="https://exemplo.com/imagem.png" {...field} />
+                                ) : (
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageFileChange}
+                                        className="file:text-primary file:font-semibold"
+                                    />
+                                )}
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {imagePreview && (
+                    <div className="mt-2 p-2 border rounded-lg flex justify-center bg-muted/50">
+                        <Image
+                            src={imagePreview}
+                            alt="Pré-visualização do produto"
+                            width={100}
+                            height={100}
+                            className="rounded-md border object-contain"
+                        />
+                    </div>
                 )}
-              />
+              </div>
+
               <FormField
                 control={form.control}
                 name="hint"
