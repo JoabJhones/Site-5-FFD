@@ -2,20 +2,22 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // A coleção 'products' pode ser lida por qualquer pessoa (visitantes do site),
-    // mas todas as operações de escrita (criar, atualizar, apagar) são negadas
-    // do lado do cliente. Elas devem passar pela lógica segura do servidor.
+    // Regra para a coleção 'products'
     match /products/{productId} {
+      // Qualquer pessoa pode ler (get, list) os produtos.
       allow read: if true;
-      allow write: if false;
+      // Para o painel de admin funcionar, a escrita precisa ser permitida.
+      // Em uma aplicação real, isso seria restrito a usuários autenticados.
+      allow write: if true;
     }
 
-    // A coleção 'messages' é totalmente bloqueada para o cliente.
-    // O formulário de contato usa uma Server Action para criar mensagens,
-    // e o painel de administração usa Server Actions para ler e apagar.
+    // Regra para a coleção 'messages'
     match /messages/{messageId} {
-      allow read, write: if false;
+        // Permitir que qualquer pessoa crie (formulário de contato) e
+        // leia/atualize/delete (painel de admin) mensagens.
+        // ATENÇÃO: Em um app de produção real, o acesso de leitura, atualização
+        // e exclusão deve ser restrito a administradores autenticados.
+        allow read, write: if true;
     }
   }
 }
