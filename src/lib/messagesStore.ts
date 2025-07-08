@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, query, orderBy, serverTimestamp, Timestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, query, orderBy, serverTimestamp, Timestamp, deleteDoc } from "firebase/firestore";
 
 const formSchema = z.object({
   name: z.string(),
@@ -60,4 +60,9 @@ export const markAsReplied = async (id: string, replyContent: string): Promise<v
         replied: true,
         replyContent: replyContent,
     });
+};
+
+export const deleteMessage = async (id: string): Promise<void> => {
+    const messageDoc = doc(db, "messages", id);
+    await deleteDoc(messageDoc);
 };

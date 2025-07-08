@@ -9,14 +9,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { handleReplySubmit, getMessages } from './actions';
+import { handleReplySubmit, getMessages, handleDeleteMessage } from './actions';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Send, Loader2, RefreshCw } from 'lucide-react';
+import { Send, Loader2, RefreshCw, Trash2 } from 'lucide-react';
 
 const replySchema = z.object({
   reply: z.string().min(10, { message: 'A resposta deve ter pelo menos 10 caracteres.' }),
@@ -87,13 +98,30 @@ export default function MessagesManager() {
     }
   };
 
+  const handleDelete = async (messageId: string, messageName: string) => {
+    const result = await handleDeleteMessage({ messageId });
+    if(result.success) {
+        toast({
+            title: 'Mensagem Apagada!',
+            description: `A mensagem de ${messageName} foi removida com sucesso.`,
+        });
+        await loadMessages();
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Falha ao Apagar',
+            description: result.error || 'Não foi possível apagar a mensagem.',
+        })
+    }
+  }
+
   return (
     <Card className="shadow-lg animate-fade-in-up">
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
             <div>
                 <CardTitle className="text-2xl font-semibold">Caixa de Entrada</CardTitle>
-                <CardDescription>Visualize e responda as mensagens enviadas através do site.</CardDescription>
+                <CardDescription>Visualize, responda e apague as mensagens enviadas através do site.</CardDescription>
             </div>
             <Button variant="outline" size="sm" onClick={loadMessages} disabled={isLoading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -130,9 +158,31 @@ export default function MessagesManager() {
                       {message.replied ? <Badge>Respondido</Badge> : <Badge variant="secondary">Pendente</Badge>}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => openReplyDialog(message)}>
-                        Ver e Responder
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                          <Button variant="outline" size="sm" onClick={() => openReplyDialog(message)}>
+                            Ver e Responder
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Apagar</span>
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Essa ação não pode ser desfeita. Isso irá apagar permanentemente a mensagem de "{message.name}".
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(message.id, message.name)} className="bg-destructive hover:bg-destructive/90">Apagar</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

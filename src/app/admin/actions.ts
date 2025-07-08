@@ -2,7 +2,7 @@
 
 import { Resend } from 'resend';
 import { z } from 'zod';
-import { getMessages as getMessagesFromDB, markAsReplied } from '@/lib/messagesStore';
+import { getMessages as getMessagesFromDB, markAsReplied, deleteMessage as deleteMessageFromDB } from '@/lib/messagesStore';
 import type { ReceivedMessage } from '@/lib/messagesStore';
 
 const replySchema = z.object({
@@ -72,4 +72,23 @@ export async function handleReplySubmit(values: z.infer<typeof replySchema>) {
 export async function getMessages(): Promise<ReceivedMessage[]> {
   // Busca os dados do Firestore através da nossa store
   return await getMessagesFromDB();
+}
+
+const deleteSchema = z.object({
+  messageId: z.string().min(1, 'ID da mensagem é obrigatório.'),
+});
+
+export async function handleDeleteMessage(values: z.infer<typeof deleteSchema>) {
+  const parsed = deleteSchema.safeParse(values);
+  if (!parsed.success) {
+    return { success: false, error: 'ID da mensagem inválido.' };
+  }
+
+  try {
+    await deleteMessageFromDB(parsed.data.messageId);
+    return { success: true };
+  } catch (error) {
+    console.error("Erro ao apagar mensagem:", error);
+    return { success: false, error: 'Ocorreu um erro ao apagar a mensagem no servidor.' };
+  }
 }
