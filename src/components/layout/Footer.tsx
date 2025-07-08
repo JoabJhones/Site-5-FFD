@@ -26,14 +26,14 @@ type SocialIconName = keyof typeof socialIcons;
 
 export default function Footer() {
   const [input, setInput] = useState('');
-  const [isClient, setIsClient] = useState(false);
   const [showAdminButton, setShowAdminButton] = useState(false);
+  const [fullCopyright, setFullCopyright] = useState(footerContent.copyright);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
+    // This effect runs only on the client, after the initial render.
+    // This prevents the hydration error by updating the date only on the client side.
+    setFullCopyright(`© ${new Date().getFullYear()} ${footerContent.copyright}`);
+    
     const onKeydown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;
@@ -58,12 +58,11 @@ export default function Footer() {
     }
   }, [input]);
 
-
   return (
     <footer className="bg-foreground text-background">
       <div className="container mx-auto py-6 px-6 text-center">
         <p className="text-sm font-semibold">
-          {isClient ? `© ${new Date().getFullYear()} ${footerContent.copyright}` : '\u00A0'}
+          {fullCopyright}
         </p>
         <p className="text-xs mt-2 opacity-80">{footerContent.address}</p>
         <p className="text-xs mt-1 opacity-80">{footerContent.contact}</p>
