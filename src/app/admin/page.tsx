@@ -39,7 +39,7 @@ export default function AdminPage() {
                 </Button>
                 <Button onClick={() => setActiveManager('about')} variant={activeManager === 'about' ? 'default' : 'outline'}>
                     <Settings className="mr-2 h-4 w-4" />
-                    Gerenciar "Sobre"
+                    Gerenciar Sobre Nós
                 </Button>
             </div>
         </div>

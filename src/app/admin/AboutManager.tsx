@@ -77,7 +77,7 @@ export default function AboutManager() {
     // Here we are just updating the local state which will not persist.
     // For the prototype, we can manually update lib/content.ts if needed.
     toast({
-      title: "Página 'Sobre' Atualizada!",
+      title: "Página 'Sobre Nós' Atualizada!",
       description: "O conteúdo da página 'Sobre Nós' foi salvo com sucesso.",
     });
   };
