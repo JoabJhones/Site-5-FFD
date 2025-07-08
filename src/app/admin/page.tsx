@@ -1,35 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { Shield } from "lucide-react";
+import { Shield, Settings, ShoppingBag } from "lucide-react";
 import AdminLogin from "./AdminLogin";
 import ProductManager from "./ProductManager";
+import AboutManager from "./AboutManager";
+import { Button } from "@/components/ui/button";
+
+type ActiveManager = 'products' | 'about';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeManager, setActiveManager] = useState<ActiveManager | null>(null);
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
   };
 
   if (!isAuthenticated) {
-    // Renderiza a tela de login se não estiver autenticado
     return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
   }
 
-  // Renderiza o painel de administração após o login bem-sucedido
   return (
     <div className="min-h-screen bg-muted">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center gap-4 mb-8">
-            <Shield className="h-10 w-10 text-primary" />
-            <div>
-                <h1 className="text-4xl font-bold">Painel de Administração</h1>
-                <p className="text-muted-foreground">Gerenciamento de produtos cadastrados no site.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+                <Shield className="h-10 w-10 text-primary" />
+                <div>
+                    <h1 className="text-4xl font-bold">Painel de Administração</h1>
+                    <p className="text-muted-foreground">Gerencie o conteúdo do seu site.</p>
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                <Button onClick={() => setActiveManager('products')} variant={activeManager === 'products' ? 'default' : 'outline'}>
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Gerenciar Produtos
+                </Button>
+                <Button onClick={() => setActiveManager('about')} variant={activeManager === 'about' ? 'default' : 'outline'}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gerenciar "Sobre"
+                </Button>
             </div>
         </div>
         
-        <ProductManager />
+        <div className="mt-8">
+          {activeManager === 'products' && <ProductManager />}
+          {activeManager === 'about' && <AboutManager />}
+          {!activeManager && (
+            <div className="text-center py-20 bg-card rounded-lg shadow-sm">
+                <h2 className="text-2xl font-semibold text-muted-foreground">Selecione uma área para gerenciar.</h2>
+                <p className="text-muted-foreground mt-2">Clique em um dos botões acima para começar a editar.</p>
+            </div>
+          )}
+        </div>
 
       </div>
     </div>
