@@ -31,12 +31,12 @@ export default function QualidadePage() {
         </div>
         <div className="flex justify-center">
           <Image
-            src="https://placehold.co/500x400.png"
+            src={qualityPageContent.media}
             alt="Controle de Qualidade"
             width={500}
             height={400}
             className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500"
-            data-ai-hint="quality control"
+            data-ai-hint={qualityPageContent.mediaHint}
           />
         </div>
       </div>

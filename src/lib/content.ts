@@ -51,6 +51,8 @@ export const productsPageContent = {
 export const qualityPageContent = {
   title: "Nosso Compromisso com a Qualidade",
   intro: "A qualidade é o pilar fundamental do Frigorífico Frango Dourado. Desde a origem da matéria-prima até a entrega final, cada etapa do nosso processo é monitorada e controlada rigorosamente para garantir a segurança alimentar e a excelência dos nossos produtos.",
+  media: "https://placehold.co/500x400.png",
+  mediaHint: "quality control",
   section1Title: "Rastreabilidade e Controle",
   section1Content: "Utilizamos sistemas avançados de rastreabilidade que nos permitem acompanhar cada lote de produto, desde a granja até o ponto de venda. Isso garante total transparência e segurança para nossos consumidores.",
   section2Title: "Certificações e Padrões",

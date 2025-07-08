@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Settings, ShoppingBag, Home } from "lucide-react";
+import { Shield, Settings, ShoppingBag, Home, Award } from "lucide-react";
 import AdminLogin from "./AdminLogin";
 import ProductManager from "./ProductManager";
 import AboutManager from "./AboutManager";
 import HomeManager from "./HomeManager";
+import QualityManager from "./QualityManager";
 import { Button } from "@/components/ui/button";
 
-type ActiveManager = 'products' | 'about' | 'home';
+type ActiveManager = 'products' | 'about' | 'home' | 'quality';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,6 +47,10 @@ export default function AdminPage() {
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     Gerenciar Produtos
                 </Button>
+                <Button onClick={() => setActiveManager('quality')} variant={activeManager === 'quality' ? 'default' : 'outline'}>
+                    <Award className="mr-2 h-4 w-4" />
+                    Gerenciar Qualidade
+                </Button>
             </div>
         </div>
         
@@ -53,6 +58,7 @@ export default function AdminPage() {
           {activeManager === 'home' && <HomeManager />}
           {activeManager === 'about' && <AboutManager />}
           {activeManager === 'products' && <ProductManager />}
+          {activeManager === 'quality' && <QualityManager />}
           {!activeManager && (
             <div className="text-center py-20 bg-card rounded-lg shadow-sm">
                 <h2 className="text-2xl font-semibold text-muted-foreground">Selecione uma área para gerenciar.</h2>
