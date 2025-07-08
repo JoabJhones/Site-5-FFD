@@ -7,7 +7,7 @@ export const navLinks = [
   { href: "/contato", label: "Contato", icon: "Mail" },
 ];
 
-export const homePageContent = {
+export const defaultHomePageContent = {
   title: "Bem-vindo ao Frigorífico Frango Dourado",
   description: "Com anos de tradição e compromisso, o Frigorífico Frango Dourado Ltda. é sinônimo de excelência na produção e distribuição de produtos avícolas. Nossa dedicação à qualidade e ao frescor garante que você leve para a sua mesa o melhor do campo.",
   heroMedia: "https://www.agrimidia.com.br/wp-content/plugins/seox-image-magick/imagick_convert.php?width=1024&height=576&format=.jpg&quality=91&imagick=/wp-content/uploads/2023/12/frango_corte-1024x576.jpg",
@@ -23,7 +23,7 @@ export const homePageContent = {
   ],
 };
 
-export const aboutPageContent = {
+export const defaultAboutPageContent = {
   title: "Sobre o Frigorífico Frango Dourado",
   history1: "Fundado em 1998, o Frigorífico Frango Dourado Ltda. nasceu da paixão pela avicultura e do desejo de oferecer produtos de carne de frango da mais alta qualidade. Desde o início, nossa missão tem sido clara: levar sabor, frescor e confiança à mesa de cada família brasileira.",
   history2: "Ao longo dos anos, crescemos e nos modernizamos, investindo em tecnologia de ponta e em uma equipe dedicada. Nossas instalações seguem os mais rigorosos padrões de higiene e segurança alimentar, garantindo que cada etapa do processo, da criação ao abate e distribuição, seja realizada com excelência.",
@@ -36,7 +36,7 @@ export const aboutPageContent = {
   ],
 };
 
-export const productsPageContent = {
+export const defaultProductsPageContent = {
   title: "Nossos Produtos",
   description: "No Frigorífico Frango Dourado, oferecemos uma vasta gama de produtos avícolas, cuidadosamente selecionados e processados para garantir a máxima qualidade e sabor.",
   products: [
@@ -49,7 +49,7 @@ export const productsPageContent = {
   ],
 };
 
-export const qualityPageContent = {
+export const defaultQualityPageContent = {
   title: "Nosso Compromisso com a Qualidade",
   intro: "A qualidade é o pilar fundamental do Frigorífico Frango Dourado. Desde a origem da matéria-prima até a entrega final, cada etapa do nosso processo é monitorada e controlada rigorosamente para garantir a segurança alimentar e a excelência dos nossos produtos.",
   media: "https://placehold.co/500x400.png",
@@ -67,7 +67,7 @@ export const qualityPageContent = {
   ],
 };
 
-export const contactPageContent = {
+export const defaultContactPageContent = {
   title: "Entre em Contato Conosco",
   intro: "Tem alguma dúvida, sugestão ou gostaria de fazer um pedido? Preencha o formulário abaixo ou utilize nossos canais de contato.",
   formTitle: "Envie-nos uma Mensagem",
@@ -78,7 +78,7 @@ export const contactPageContent = {
   hours: "Seg-Sex, 8h-18h",
 };
 
-export const footerContent = {
+export const defaultFooterContent = {
   copyright: "Frigorífico Frango Dourado Ltda. Todos os direitos reservados.",
   address: "Rua Sizenando Carneiro Leão 10, Carpina - PE, Brasil",
   contact: "Telefone: (81) 3621-1544 | Email: contato@frangodourado.com.br",
@@ -88,25 +88,38 @@ export const footerContent = {
   ],
 };
 
+export const defaultContent = {
+    home: defaultHomePageContent,
+    sobre: defaultAboutPageContent,
+    products: {
+        title: defaultProductsPageContent.title,
+        description: defaultProductsPageContent.description
+    },
+    quality: defaultQualityPageContent,
+    contact: defaultContactPageContent,
+    footer: defaultFooterContent
+}
+
+// This is used by the AI Optimizer to know which pages are available
 export const pageContentsForAI = {
   home: {
-    title: homePageContent.title,
-    description: homePageContent.description,
+    title: defaultHomePageContent.title,
+    description: defaultHomePageContent.description,
   },
   sobre: {
-    title: aboutPageContent.title,
-    description: `${aboutPageContent.history1} ${aboutPageContent.history2}`,
+    title: defaultAboutPageContent.title,
+    description: `${defaultAboutPageContent.history1} ${defaultAboutPageContent.history2}`,
   },
   products: {
-    title: productsPageContent.title,
-    description: productsPageContent.description,
+    title: defaultProductsPageContent.title,
+    description: defaultProductsPageContent.description,
   },
   quality: {
-    title: qualityPageContent.title,
-    description: qualityPageContent.intro,
+    title: defaultQualityPageContent.title,
+    description: defaultQualityPageContent.intro,
   },
   contact: {
-    title: contactPageContent.title,
-    description: contactPageContent.intro,
+    title: defaultContactPageContent.title,
+    description: defaultContactPageContent.intro,
   }
 }

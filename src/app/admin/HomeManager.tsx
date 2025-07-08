@@ -4,17 +4,18 @@ import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { homePageContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Save } from 'lucide-react';
+import { PlusCircle, Trash2, Save, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { getPageContent, updatePageContent } from './actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const featureSchema = z.object({
   title: z.string().min(3, { message: 'O título deve ter pelo menos 3 caracteres.' }),
@@ -35,14 +36,33 @@ const homeSchema = z.object({
 
 export default function HomeManager() {
   const { toast } = useToast();
-  const [homeData, setHomeData] = useState(homePageContent);
+  const [isLoading, setIsLoading] = useState(true);
   const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof homeSchema>>({
     resolver: zodResolver(homeSchema),
-    defaultValues: homePageContent,
+    defaultValues: {
+        title: '',
+        description: '',
+        heroMedia: '',
+        heroMediaHint: '',
+        cta: { products: '', contact: '' },
+        features: [],
+    },
   });
+
+  useEffect(() => {
+    const fetchContent = async () => {
+        setIsLoading(true);
+        const content = await getPageContent('home');
+        if (content) {
+            form.reset(content);
+        }
+        setIsLoading(false);
+    }
+    fetchContent();
+  }, [form]);
   
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -73,14 +93,47 @@ export default function HomeManager() {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof homeSchema>) => {
-    setHomeData(values);
-    // Note: In a real app, this would update the content source.
-    toast({
-      title: "Página 'Início' Atualizada!",
-      description: "O conteúdo da página 'Início' foi salvo com sucesso.",
-    });
+  const onSubmit = async (values: z.infer<typeof homeSchema>) => {
+    const result = await updatePageContent('home', values);
+    if(result.success) {
+        toast({
+            title: "Página 'Início' Atualizada!",
+            description: "O conteúdo da página 'Início' foi salvo com sucesso.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar",
+            description: result.error || "Não foi possível salvar o conteúdo."
+        });
+    }
   };
+
+  if (isLoading) {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-3/5" />
+                <Skeleton className="h-4 w-4/5" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg animate-fade-in-up">
@@ -281,9 +334,9 @@ export default function HomeManager() {
             
             <Separator />
 
-            <Button type="submit" className="w-full" size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Alterações
+            <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </form>
         </Form>

@@ -1,9 +1,10 @@
 import { Suspense } from 'react';
-import { contactPageContent } from '@/lib/content';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import ContactForm from './ContactForm';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getContent } from '@/lib/contentStore';
+import type { ContactContent } from '@/lib/contentStore';
 
 function ContactFormSkeleton() {
   return (
@@ -29,7 +30,9 @@ function ContactFormSkeleton() {
   );
 }
 
-export default function ContatoPage() {
+export default async function ContatoPage() {
+  const contactPageContent = await getContent('contact') as ContactContent;
+
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
       <div className="text-center mb-12">

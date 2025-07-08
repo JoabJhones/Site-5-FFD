@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { footerContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
+import type { FooterContent } from '@/lib/contentStore';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -24,14 +24,16 @@ const socialIcons = {
 
 type SocialIconName = keyof typeof socialIcons;
 
-export default function Footer() {
+type FooterProps = {
+    footerContent: FooterContent;
+}
+
+export default function Footer({ footerContent }: FooterProps) {
   const [input, setInput] = useState('');
   const [showAdminButton, setShowAdminButton] = useState(false);
   const [fullCopyright, setFullCopyright] = useState(footerContent.copyright);
 
   useEffect(() => {
-    // This effect runs only on the client, after the initial render.
-    // This prevents the hydration error by updating the date only on the client side.
     setFullCopyright(`© ${new Date().getFullYear()} ${footerContent.copyright}`);
     
     const onKeydown = (e: KeyboardEvent) => {
@@ -49,7 +51,7 @@ export default function Footer() {
     
     window.addEventListener('keydown', onKeydown);
     return () => window.removeEventListener('keydown', onKeydown);
-  }, []);
+  }, [footerContent.copyright]);
 
   useEffect(() => {
     if (input.toLowerCase() === 'admin') {

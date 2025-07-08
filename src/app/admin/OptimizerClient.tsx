@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { handleOptimizeContent } from "./actions";
+import { handleOptimizeContent, getPageContentForAI } from "./actions";
 import type { OptimizeWebsiteContentOutput } from "@/ai/flows/optimize-website-content";
 import { pageContentsForAI } from "@/lib/content";
 import { Wand2, BrainCircuit, Loader2 } from "lucide-react";
@@ -32,6 +32,7 @@ export default function OptimizerClient() {
   const [optimizationResult, setOptimizationResult] = useState<OptimizeWebsiteContentOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingContent, setIsFetchingContent] = useState(false);
   const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaForUpload, setMediaForUpload] = useState<string | null>(null);
@@ -74,13 +75,21 @@ export default function OptimizerClient() {
     setMediaForUpload(url);
   };
 
-  const handlePageChange = (page: PageName) => {
-    const content = pageContentsForAI[page];
+  const handlePageChange = async (page: PageName) => {
+    setIsFetchingContent(true);
+    form.setValue("pageName", page);
+    form.setValue("currentTitle", "Carregando...");
+    form.setValue("currentDescription", "Carregando...");
+
+    const content = await getPageContentForAI(page);
     if (content) {
-      form.setValue("pageName", page);
       form.setValue("currentTitle", content.title);
       form.setValue("currentDescription", content.description);
+    } else {
+      form.setValue("currentTitle", "Não foi possível carregar o título");
+      form.setValue("currentDescription", "Não foi possível carregar a descrição");
     }
+    setIsFetchingContent(false);
   };
 
   async function onSubmit(values: z.infer<typeof optimizerSchema>) {
@@ -226,7 +235,7 @@ export default function OptimizerClient() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full" disabled={isLoading || isFetchingContent}>
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                   {isLoading ? "Otimizando..." : "Otimizar com IA"}
                 </Button>

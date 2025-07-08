@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { getContent } from '@/lib/contentStore';
+import type { FooterContent } from '@/lib/contentStore';
 
 export const metadata: Metadata = {
   title: 'Frango Dourado Ltda',
@@ -11,11 +13,14 @@ export const metadata: Metadata = {
   keywords: ['frango', 'frigorífico', 'alimentos', 'carnes', 'qualidade'],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const footerContent = await getContent('footer') as FooterContent;
+
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <head>
@@ -29,7 +34,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
-          <Footer />
+          <Footer footerContent={footerContent} />
         </div>
         <Toaster />
       </body>

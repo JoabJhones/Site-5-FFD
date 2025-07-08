@@ -1,18 +1,19 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { footerContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Save } from 'lucide-react';
+import { PlusCircle, Trash2, Save, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
+import { getPageContent, updatePageContent } from './actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const socialLinkSchema = z.object({
   name: z.string().min(1, { message: 'O nome da rede social é obrigatório (Ex: Facebook).' }),
@@ -28,26 +29,76 @@ const footerSchema = z.object({
 
 export default function FooterManager() {
   const { toast } = useToast();
-  const [footerData, setFooterData] = useState(footerContent);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<z.infer<typeof footerSchema>>({
     resolver: zodResolver(footerSchema),
-    defaultValues: footerContent,
+    defaultValues: {
+        copyright: '',
+        address: '',
+        contact: '',
+        socialLinks: [],
+    },
   });
+
+  useEffect(() => {
+    const fetchContent = async () => {
+        setIsLoading(true);
+        const content = await getPageContent('footer');
+        if (content) {
+            form.reset(content);
+        }
+        setIsLoading(false);
+    }
+    fetchContent();
+  }, [form]);
   
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "socialLinks",
   });
 
-  const onSubmit = (values: z.infer<typeof footerSchema>) => {
-    setFooterData(values);
-    // Note: In a real app, this would update the content source.
-    toast({
-      title: "Rodapé Atualizado!",
-      description: "O conteúdo do rodapé do site foi salvo com sucesso.",
-    });
+  const onSubmit = async (values: z.infer<typeof footerSchema>) => {
+    const result = await updatePageContent('footer', values);
+    if(result.success) {
+        toast({
+            title: "Rodapé Atualizado!",
+            description: "O conteúdo do rodapé do site foi salvo com sucesso.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar",
+            description: result.error || "Não foi possível salvar o conteúdo."
+        });
+    }
   };
+
+  if (isLoading) {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-3/5" />
+                <Skeleton className="h-4 w-4/5" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg animate-fade-in-up">
@@ -163,9 +214,9 @@ export default function FooterManager() {
             
             <Separator />
 
-            <Button type="submit" className="w-full" size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Alterações
+            <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </form>
         </Form>

@@ -4,6 +4,8 @@ import { Resend } from 'resend';
 import { z } from 'zod';
 import { getMessages as getMessagesFromDB, markAsReplied, deleteMessage as deleteMessageFromDB } from '@/lib/messagesStore';
 import type { ReceivedMessage } from '@/lib/messagesStore';
+import { getContent, updateContent } from '@/lib/contentStore';
+import type { PageName } from '@/lib/contentStore';
 
 const replySchema = z.object({
     name: z.string(),
@@ -91,4 +93,34 @@ export async function handleDeleteMessage(values: z.infer<typeof deleteSchema>) 
     console.error("Erro ao apagar mensagem:", error);
     return { success: false, error: 'Ocorreu um erro ao apagar a mensagem no servidor.' };
   }
+}
+
+
+export async function getPageContent(page: PageName) {
+    try {
+        return await getContent(page);
+    } catch(error) {
+        console.error(`Error fetching content for page ${page}:`, error);
+        return null;
+    }
+}
+
+export async function updatePageContent(page: PageName, data: any) {
+    try {
+        await updateContent(page, data);
+        return { success: true };
+    } catch (error) {
+        console.error(`Error updating content for page ${page}:`, error);
+        return { success: false, error: `Falha ao atualizar a página ${page}.` };
+    }
+}
+
+export async function getPageContentForAI(pageName: PageName) {
+    const content = await getContent(pageName);
+    if (!content) return null;
+    
+    // Normalize description field from different content types
+    const description = content.description || content.intro || (content.history1 ? `${content.history1} ${content.history2}` : '');
+
+    return { title: content.title, description: description };
 }

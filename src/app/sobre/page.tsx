@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { aboutPageContent } from '@/lib/content';
 import { Goal, Handshake, Lightbulb } from 'lucide-react';
+import { getContent } from '@/lib/contentStore';
+import type { AboutContent } from '@/lib/contentStore';
 
 const valueIcons = {
   "Qualidade Inquestionável": Goal,
@@ -11,7 +12,9 @@ const valueIcons = {
 
 type ValueTitle = keyof typeof valueIcons;
 
-export default function SobreNosPage() {
+export default async function SobreNosPage() {
+  const aboutPageContent = await getContent('about') as AboutContent;
+
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
       <div className="text-center mb-12">
@@ -41,7 +44,7 @@ export default function SobreNosPage() {
         <h2 className="text-3xl md:text-4xl font-semibold mb-10">Nossos Valores</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {aboutPageContent.values.map((value) => {
-            const Icon = valueIcons[value.title as ValueTitle];
+            const Icon = valueIcons[value.title as ValueTitle] || Lightbulb;
             return (
               <Card key={value.title} className="text-center border-2 border-transparent hover:border-primary/50 hover:shadow-xl transition-all duration-300">
                 <CardHeader>

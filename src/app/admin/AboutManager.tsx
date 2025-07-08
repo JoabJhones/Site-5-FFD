@@ -4,17 +4,18 @@ import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { aboutPageContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Save } from 'lucide-react';
+import { PlusCircle, Trash2, Save, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { getPageContent, updatePageContent } from './actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const valueSchema = z.object({
   title: z.string().min(3, { message: 'O título deve ter pelo menos 3 caracteres.' }),
@@ -32,15 +33,34 @@ const aboutSchema = z.object({
 
 export default function AboutManager() {
   const { toast } = useToast();
-  const [aboutData, setAboutData] = useState(aboutPageContent);
+  const [isLoading, setIsLoading] = useState(true);
   const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof aboutSchema>>({
     resolver: zodResolver(aboutSchema),
-    defaultValues: aboutPageContent,
+    defaultValues: {
+      title: '',
+      history1: '',
+      history2: '',
+      image: '',
+      imageHint: '',
+      values: [],
+    },
   });
   
+  useEffect(() => {
+    const fetchContent = async () => {
+        setIsLoading(true);
+        const content = await getPageContent('about');
+        if (content) {
+            form.reset(content);
+        }
+        setIsLoading(false);
+    }
+    fetchContent();
+  }, [form]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "values",
@@ -70,16 +90,47 @@ export default function AboutManager() {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof aboutSchema>) => {
-    setAboutData(values);
-    // Note: In a real app, you would need to update the content source.
-    // Here we are just updating the local state which will not persist.
-    // For the prototype, we can manually update lib/content.ts if needed.
-    toast({
-      title: "Página 'Sobre Nós' Atualizada!",
-      description: "O conteúdo da página 'Sobre Nós' foi salvo com sucesso.",
-    });
+  const onSubmit = async (values: z.infer<typeof aboutSchema>) => {
+    const result = await updatePageContent('about', values);
+    if(result.success) {
+        toast({
+            title: "Página 'Sobre Nós' Atualizada!",
+            description: "O conteúdo da página 'Sobre Nós' foi salvo com sucesso.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar",
+            description: result.error || "Não foi possível salvar o conteúdo."
+        });
+    }
   };
+
+  if (isLoading) {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-3/5" />
+                <Skeleton className="h-4 w-4/5" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg animate-fade-in-up">
@@ -263,9 +314,9 @@ export default function AboutManager() {
             
             <Separator />
 
-            <Button type="submit" className="w-full" size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Alterações
+            <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </form>
         </Form>

@@ -1,8 +1,11 @@
 import Image from 'next/image';
-import { qualityPageContent } from '@/lib/content';
 import { ShieldCheck } from 'lucide-react';
+import { getContent } from '@/lib/contentStore';
+import type { QualityContent } from '@/lib/contentStore';
 
-export default function QualidadePage() {
+export default async function QualidadePage() {
+  const qualityPageContent = await getContent('quality') as QualityContent;
+
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
       <div className="text-center mb-12">

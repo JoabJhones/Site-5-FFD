@@ -2,10 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { homePageContent } from '@/lib/content';
 import { CheckCircle } from 'lucide-react';
+import { getContent } from '@/lib/contentStore';
+import type { HomeContent } from '@/lib/contentStore';
 
-export default function Home() {
+export default async function Home() {
+  const homePageContent = await getContent('home') as HomeContent;
+
   return (
     <div className="flex flex-col">
       <section className="relative h-[60vh] md:h-[70vh] w-full flex items-center justify-center text-center text-white">

@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { contactPageContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
+import { getPageContent, updatePageContent } from './actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const contactSchema = z.object({
   title: z.string().min(10, { message: 'O título principal deve ter pelo menos 10 caracteres.' }),
@@ -27,21 +28,75 @@ const contactSchema = z.object({
 
 export default function ContactManager() {
   const { toast } = useToast();
-  const [contactData, setContactData] = useState(contactPageContent);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<z.infer<typeof contactSchema>>({
     resolver: zodResolver(contactSchema),
-    defaultValues: contactPageContent,
+    defaultValues: {
+      title: '',
+      intro: '',
+      formTitle: '',
+      detailsTitle: '',
+      email: '',
+      phone: '',
+      address: '',
+      hours: '',
+    },
   });
 
-  const onSubmit = (values: z.infer<typeof contactSchema>) => {
-    setContactData(values);
-    // Note: In a real app, this would update the content source.
-    toast({
-      title: "Página 'Contato' Atualizada!",
-      description: "O conteúdo da página 'Contato' foi salvo com sucesso.",
-    });
+  useEffect(() => {
+    const fetchContent = async () => {
+        setIsLoading(true);
+        const content = await getPageContent('contact');
+        if (content) {
+            form.reset(content);
+        }
+        setIsLoading(false);
+    }
+    fetchContent();
+  }, [form]);
+
+  const onSubmit = async (values: z.infer<typeof contactSchema>) => {
+    const result = await updatePageContent('contact', values);
+    if(result.success) {
+        toast({
+            title: "Página 'Contato' Atualizada!",
+            description: "O conteúdo da página 'Contato' foi salvo com sucesso.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar",
+            description: result.error || "Não foi possível salvar o conteúdo."
+        });
+    }
   };
+
+  if (isLoading) {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-3/5" />
+                <Skeleton className="h-4 w-4/5" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-full" />
+            </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg animate-fade-in-up">
@@ -171,9 +226,9 @@ export default function ContactManager() {
 
             <Separator />
 
-            <Button type="submit" className="w-full" size="lg">
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Alterações
+            <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </form>
         </Form>
