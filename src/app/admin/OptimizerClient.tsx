@@ -39,6 +39,8 @@ export default function OptimizerClient() {
   const form = useForm<z.infer<typeof optimizerSchema>>({
     resolver: zodResolver(optimizerSchema),
     defaultValues: {
+      currentTitle: "",
+      currentDescription: "",
       trafficData: '{"pageViews": 1500, "bounceRate": "65%"}',
       engagementData: '{"timeOnPage": "1m 15s", "scrollDepth": "70%"}',
     },
