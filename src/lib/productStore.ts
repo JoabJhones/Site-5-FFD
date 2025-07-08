@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, writeBatch } from "firebase/firestore";
-import { productsPageContent } from "./content";
+import { defaultProductsPageContent } from "./content";
 
 const productSchema = z.object({
   id: z.string().optional(),
@@ -21,7 +21,7 @@ const productsCol = collection(db, "products");
 const seedDatabase = async (): Promise<Product[]> => {
     console.log("Product collection empty. Seeding database with initial products...");
     const batch = writeBatch(db);
-    const initialProducts = productsPageContent.products.map(p => {
+    const initialProducts = defaultProductsPageContent.products.map(p => {
         const docRef = doc(productsCol);
         batch.set(docRef, p);
         return { ...p, id: docRef.id };

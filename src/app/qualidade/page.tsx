@@ -1,10 +1,70 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ShieldCheck } from 'lucide-react';
 import { getContent } from '@/lib/contentStore';
 import type { QualityContent } from '@/lib/contentStore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default async function QualidadePage() {
-  const qualityPageContent = await getContent('quality') as QualityContent;
+function QualidadePageSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-16 lg:py-24">
+      <div className="text-center mb-12">
+        <Skeleton className="h-12 w-3/4 mx-auto" />
+        <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="space-y-8">
+          <div>
+            <Skeleton className="h-9 w-1/2 mb-3" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-5/6 mt-2" />
+          </div>
+          <div>
+            <Skeleton className="h-9 w-1/2 mb-3" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-3/4 mt-2" />
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <Skeleton className="h-[400px] w-full max-w-[500px] rounded-lg" />
+        </div>
+      </div>
+
+      <div className="text-center bg-card p-8 md:p-12 rounded-lg shadow-xl">
+        <Skeleton className="h-10 w-1/2 mx-auto mb-8" />
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <li key={index} className="flex items-start space-x-3">
+              <Skeleton className="h-6 w-6 rounded-full flex-shrink-0 mt-1" />
+              <Skeleton className="h-6 w-full" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default function QualidadePage() {
+  const [qualityPageContent, setQualityPageContent] = useState<QualityContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setIsLoading(true);
+      const content = await getContent('quality') as QualityContent;
+      setQualityPageContent(content);
+      setIsLoading(false);
+    }
+    fetchContent();
+  }, []);
+
+  if (isLoading || !qualityPageContent) {
+    return <QualidadePageSkeleton />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">

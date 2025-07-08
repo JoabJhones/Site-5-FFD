@@ -6,40 +6,39 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { productsPageContent } from '@/lib/content';
 import { getProducts, type Product } from '@/lib/productStore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getContent } from '@/lib/contentStore';
+import type { ProductsPageContentInfo } from '@/lib/contentStore';
 
 export default function ProdutosPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [pageContent, setPageContent] = useState<ProductsPageContentInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchPageData = async () => {
       setIsLoading(true);
       try {
         const serverProducts = await getProducts();
+        const serverPageContent = await getContent('products') as ProductsPageContentInfo;
         setProducts(serverProducts);
+        setPageContent(serverPageContent);
       } catch (error) {
-        console.error("Failed to fetch products:", error);
-        // Optionally, show a toast or error message to the user
+        console.error("Failed to fetch page data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchProducts();
+    fetchPageData();
   }, []);
 
   const renderSkeleton = () => (
     <div className="container mx-auto px-4 py-16 lg:py-24">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">
-          {productsPageContent.title}
-        </h1>
-        <p className="mt-4 max-w-3xl mx-auto text-lg text-foreground/80">
-          {productsPageContent.description}
-        </p>
+        <Skeleton className="h-12 w-3/4 mx-auto" />
+        <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -61,7 +60,7 @@ export default function ProdutosPage() {
     </div>
   );
 
-  if (isLoading) {
+  if (isLoading || !pageContent) {
     return renderSkeleton();
   }
 
@@ -70,10 +69,10 @@ export default function ProdutosPage() {
       <div className="container mx-auto px-4 py-16 lg:py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">
-            {productsPageContent.title}
+            {pageContent.title}
           </h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-foreground/80">
-            {productsPageContent.description}
+            {pageContent.description}
           </p>
         </div>
 

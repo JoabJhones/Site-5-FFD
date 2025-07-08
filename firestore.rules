@@ -1,23 +1,13 @@
-rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Regra para a coleção 'products'
-    match /products/{productId} {
-      // Qualquer pessoa pode ler (get, list) os produtos.
-      allow read: if true;
-      // Para o painel de admin funcionar, a escrita precisa ser permitida.
-      // Em uma aplicação real, isso seria restrito a usuários autenticados.
-      allow write: if true;
-    }
-
-    // Regra para a coleção 'messages'
-    match /messages/{messageId} {
-        // Permitir que qualquer pessoa crie (formulário de contato) e
-        // leia/atualize/delete (painel de admin) mensagens.
-        // ATENÇÃO: Em um app de produção real, o acesso de leitura, atualização
-        // e exclusão deve ser restrito a administradores autenticados.
-        allow read, write: if true;
+    // Permite leitura e escrita em todos os documentos por qualquer pessoa.
+    // Esta regra é permissiva para garantir que o processo de build do Next.js e o painel de administração
+    // (que não possui autenticação) funcionem corretamente.
+    // Para um aplicativo em produção, implemente autenticação e restrinja o acesso de escrita
+    // apenas para usuários autenticados e autorizados.
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

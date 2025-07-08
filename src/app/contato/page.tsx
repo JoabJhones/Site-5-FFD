@@ -1,7 +1,9 @@
-import { Suspense } from 'react';
+"use client";
+
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
-import ContactForm from './ContactForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getContent } from '@/lib/contentStore';
 import type { ContactContent } from '@/lib/contentStore';
@@ -30,8 +32,57 @@ function ContactFormSkeleton() {
   );
 }
 
-export default async function ContatoPage() {
-  const contactPageContent = await getContent('contact') as ContactContent;
+const ContactForm = dynamic(() => import('./ContactForm'), {
+  ssr: false,
+  loading: () => <ContactFormSkeleton />,
+});
+
+function ContatoPageSkeleton() {
+    return (
+        <div className="container mx-auto px-4 py-16 lg:py-24">
+            <div className="text-center mb-12">
+                <Skeleton className="h-12 w-3/4 mx-auto" />
+                <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <Card className="shadow-lg">
+                    <CardHeader><Skeleton className="h-9 w-1/2" /></CardHeader>
+                    <CardContent><ContactFormSkeleton /></CardContent>
+                </Card>
+                <div className="space-y-8">
+                    <Card>
+                        <CardHeader><Skeleton className="h-9 w-1/2" /></CardHeader>
+                        <CardContent className="space-y-4">
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                        </CardContent>
+                    </Card>
+                    <Skeleton className="h-64 w-full" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function ContatoPage() {
+  const [contactPageContent, setContactPageContent] = useState<ContactContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setIsLoading(true);
+      const content = await getContent('contact') as ContactContent;
+      setContactPageContent(content);
+      setIsLoading(false);
+    };
+    fetchContent();
+  }, []);
+
+  if (isLoading || !contactPageContent) {
+    return <ContatoPageSkeleton />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
@@ -50,9 +101,7 @@ export default async function ContatoPage() {
             <CardTitle className="text-3xl font-semibold">{contactPageContent.formTitle}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<ContactFormSkeleton />}>
-              <ContactForm />
-            </Suspense>
+            <ContactForm />
           </CardContent>
         </Card>
 

@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { getContent } from '@/lib/contentStore';
 import type { FooterContent } from '@/lib/contentStore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -24,18 +26,24 @@ const socialIcons = {
 
 type SocialIconName = keyof typeof socialIcons;
 
-type FooterProps = {
-    footerContent: FooterContent;
-}
-
-export default function Footer({ footerContent }: FooterProps) {
+export default function Footer() {
   const [input, setInput] = useState('');
   const [showAdminButton, setShowAdminButton] = useState(false);
-  const [fullCopyright, setFullCopyright] = useState(footerContent.copyright);
+  const [footerContent, setFooterContent] = useState<FooterContent | null>(null);
+  const [fullCopyright, setFullCopyright] = useState<string | null>(null);
 
   useEffect(() => {
-    setFullCopyright(`© ${new Date().getFullYear()} ${footerContent.copyright}`);
-    
+    const fetchContent = async () => {
+      const content = await getContent('footer') as FooterContent;
+      setFooterContent(content);
+      if (content) {
+        setFullCopyright(`© ${new Date().getFullYear()} ${content.copyright}`);
+      }
+    }
+    fetchContent();
+  }, []);
+
+  useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;
@@ -51,7 +59,7 @@ export default function Footer({ footerContent }: FooterProps) {
     
     window.addEventListener('keydown', onKeydown);
     return () => window.removeEventListener('keydown', onKeydown);
-  }, [footerContent.copyright]);
+  }, []);
 
   useEffect(() => {
     if (input.toLowerCase() === 'admin') {
@@ -63,23 +71,31 @@ export default function Footer({ footerContent }: FooterProps) {
   return (
     <footer className="bg-foreground text-background">
       <div className="container mx-auto py-6 px-6 text-center">
-        <p className="text-sm font-semibold">
-          {fullCopyright}
-        </p>
-        <p className="text-xs mt-2 opacity-80">{footerContent.address}</p>
-        <p className="text-xs mt-1 opacity-80">{footerContent.contact}</p>
-        <div className="flex justify-center space-x-4 mt-3">
-            {footerContent.socialLinks.map((link) => {
-                const IconComponent = socialIcons[link.name as SocialIconName];
-                if (!IconComponent) return null;
-                return (
-                    <Link key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-background hover:text-primary transition-colors">
-                        <IconComponent className="w-5 h-5" />
-                        <span className="sr-only">{link.name}</span>
-                    </Link>
-                );
-            })}
-        </div>
+        {footerContent ? (
+          <>
+            <p className="text-sm font-semibold">{fullCopyright}</p>
+            <p className="text-xs mt-2 opacity-80">{footerContent.address}</p>
+            <p className="text-xs mt-1 opacity-80">{footerContent.contact}</p>
+            <div className="flex justify-center space-x-4 mt-3">
+              {footerContent.socialLinks.map((link) => {
+                  const IconComponent = socialIcons[link.name as SocialIconName];
+                  if (!IconComponent) return null;
+                  return (
+                      <Link key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-background hover:text-primary transition-colors">
+                          <IconComponent className="w-5 h-5" />
+                          <span className="sr-only">{link.name}</span>
+                      </Link>
+                  );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="space-y-2 flex flex-col items-center">
+            <Skeleton className="h-4 w-1/2 bg-background/20" />
+            <Skeleton className="h-3 w-3/4 bg-background/20" />
+            <Skeleton className="h-3 w-3/4 bg-background/20" />
+          </div>
+        )}
         {showAdminButton && (
           <div className="mt-4">
             <Button asChild variant="ghost" size="sm" className="text-background/70 hover:text-primary">

@@ -1,8 +1,12 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Goal, Handshake, Lightbulb } from 'lucide-react';
 import { getContent } from '@/lib/contentStore';
 import type { AboutContent } from '@/lib/contentStore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const valueIcons = {
   "Qualidade Inquestionável": Goal,
@@ -12,8 +16,61 @@ const valueIcons = {
 
 type ValueTitle = keyof typeof valueIcons;
 
-export default async function SobreNosPage() {
-  const aboutPageContent = await getContent('about') as AboutContent;
+function SobrePageSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-16 lg:py-24">
+      <div className="text-center mb-12">
+        <Skeleton className="h-12 w-3/4 mx-auto" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-5/6" />
+          <Skeleton className="h-6 w-full mt-4" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-3/4" />
+        </div>
+        <div className="flex justify-center">
+          <Skeleton className="h-[400px] w-full max-w-[500px] rounded-lg" />
+        </div>
+      </div>
+
+      <div className="text-center">
+        <Skeleton className="h-10 w-1/2 mx-auto mb-10" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i} className="text-center p-6">
+              <Skeleton className="h-16 w-16 rounded-full mx-auto mb-4" />
+              <Skeleton className="h-7 w-3/4 mx-auto mb-2" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3 mt-2" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SobreNosPage() {
+  const [aboutPageContent, setAboutPageContent] = useState<AboutContent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setIsLoading(true);
+      const content = await getContent('sobre') as AboutContent;
+      setAboutPageContent(content);
+      setIsLoading(false);
+    }
+    fetchContent();
+  }, []);
+
+  if (isLoading || !aboutPageContent) {
+    return <SobrePageSkeleton />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
