@@ -56,22 +56,22 @@ export default function Footer() {
 
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer className="bg-foreground text-background">
       <div className="container mx-auto py-8 px-6 text-center">
         <p className="font-semibold">&copy; {year} {footerContent.copyright}</p>
-        <p className="text-sm mt-2">{footerContent.address}</p>
-        <p className="text-sm mt-1">{footerContent.contact}</p>
+        <p className="text-sm mt-2 opacity-80">{footerContent.address}</p>
+        <p className="text-sm mt-1 opacity-80">{footerContent.contact}</p>
         <div className="flex justify-center space-x-4 mt-4">
-            <Link href="#" className="text-secondary-foreground hover:text-primary transition-colors">
+            <Link href="#" className="text-background hover:text-primary transition-colors">
                 <FacebookIcon className="w-6 h-6" />
             </Link>
-            <Link href="#" className="text-secondary-foreground hover:text-primary transition-colors">
+            <Link href="#" className="text-background hover:text-primary transition-colors">
                 <InstagramIcon className="w-6 h-6" />
             </Link>
         </div>
         {showAdminButton && (
           <div className="mt-6">
-            <Button asChild variant="ghost" className="text-muted-foreground hover:text-primary">
+            <Button asChild variant="ghost" className="text-background/70 hover:text-primary">
               <Link href="/admin">Acesso Administrativo</Link>
             </Button>
           </div>
