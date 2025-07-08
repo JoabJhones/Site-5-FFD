@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Settings, ShoppingBag } from "lucide-react";
+import { Shield, Settings, ShoppingBag, Home } from "lucide-react";
 import AdminLogin from "./AdminLogin";
 import ProductManager from "./ProductManager";
 import AboutManager from "./AboutManager";
+import HomeManager from "./HomeManager";
 import { Button } from "@/components/ui/button";
 
-type ActiveManager = 'products' | 'about';
+type ActiveManager = 'products' | 'about' | 'home';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,20 +34,25 @@ export default function AdminPage() {
                 </div>
             </div>
             <div className="flex flex-wrap gap-2">
-                <Button onClick={() => setActiveManager('products')} variant={activeManager === 'products' ? 'default' : 'outline'}>
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    Gerenciar Produtos
+                <Button onClick={() => setActiveManager('home')} variant={activeManager === 'home' ? 'default' : 'outline'}>
+                    <Home className="mr-2 h-4 w-4" />
+                    Gerenciar Início
                 </Button>
                 <Button onClick={() => setActiveManager('about')} variant={activeManager === 'about' ? 'default' : 'outline'}>
                     <Settings className="mr-2 h-4 w-4" />
                     Gerenciar Sobre Nós
                 </Button>
+                <Button onClick={() => setActiveManager('products')} variant={activeManager === 'products' ? 'default' : 'outline'}>
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Gerenciar Produtos
+                </Button>
             </div>
         </div>
         
         <div className="mt-8">
-          {activeManager === 'products' && <ProductManager />}
+          {activeManager === 'home' && <HomeManager />}
           {activeManager === 'about' && <AboutManager />}
+          {activeManager === 'products' && <ProductManager />}
           {!activeManager && (
             <div className="text-center py-20 bg-card rounded-lg shadow-sm">
                 <h2 className="text-2xl font-semibold text-muted-foreground">Selecione uma área para gerenciar.</h2>

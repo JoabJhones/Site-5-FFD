@@ -9,6 +9,8 @@ export const navLinks = [
 export const homePageContent = {
   title: "Bem-vindo ao Frigorífico Frango Dourado",
   description: "Com anos de tradição e compromisso, o Frigorífico Frango Dourado Ltda. é sinônimo de excelência na produção e distribuição de produtos avícolas. Nossa dedicação à qualidade e ao frescor garante que você leve para a sua mesa o melhor do campo.",
+  heroMedia: "https://www.agrimidia.com.br/wp-content/plugins/seox-image-magick/imagick_convert.php?width=1024&height=576&format=.jpg&quality=91&imagick=/wp-content/uploads/2023/12/frango_corte-1024x576.jpg",
+  heroMediaHint: "chicken cuts",
   cta: {
     products: "Conheça Nossos Produtos",
     contact: "Fale Conosco",
