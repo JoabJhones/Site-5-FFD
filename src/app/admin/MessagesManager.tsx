@@ -64,6 +64,7 @@ export default function MessagesManager() {
     if (!selectedMessage) return;
 
     const result = await handleReplySubmit({
+      name: selectedMessage.name,
       to: selectedMessage.email,
       subject: selectedMessage.subject,
       html: values.reply.replace(/\n/g, '<br>'),
