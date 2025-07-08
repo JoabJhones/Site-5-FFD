@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -17,6 +18,12 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+const socialIcons = {
+    Facebook: FacebookIcon,
+    Instagram: InstagramIcon,
+};
+
+type SocialIconName = keyof typeof socialIcons;
 
 export default function Footer() {
   const [input, setInput] = useState('');
@@ -34,11 +41,9 @@ export default function Footer() {
       }
       
       const newKey = e.key.toLowerCase();
-      // Permite apenas caracteres alfabéticos para compor a palavra "admin"
       if (newKey.length === 1 && 'abcdefghijklmnopqrstuvwxyz'.includes(newKey)) {
         setInput(prev => (prev + newKey).slice(-5));
       } else if (newKey === 'backspace') {
-        // Permite apagar
         setInput(prev => prev.slice(0, -1));
       }
     };
@@ -64,12 +69,16 @@ export default function Footer() {
         <p className="text-sm mt-2 opacity-80">{footerContent.address}</p>
         <p className="text-sm mt-1 opacity-80">{footerContent.contact}</p>
         <div className="flex justify-center space-x-4 mt-4">
-            <Link href="#" className="text-background hover:text-primary transition-colors">
-                <FacebookIcon className="w-6 h-6" />
-            </Link>
-            <Link href="#" className="text-background hover:text-primary transition-colors">
-                <InstagramIcon className="w-6 h-6" />
-            </Link>
+            {footerContent.socialLinks.map((link) => {
+                const IconComponent = socialIcons[link.name as SocialIconName];
+                if (!IconComponent) return null;
+                return (
+                    <Link key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-background hover:text-primary transition-colors">
+                        <IconComponent className="w-6 h-6" />
+                        <span className="sr-only">{link.name}</span>
+                    </Link>
+                );
+            })}
         </div>
         {showAdminButton && (
           <div className="mt-6">

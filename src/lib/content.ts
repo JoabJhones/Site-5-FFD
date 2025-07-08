@@ -1,3 +1,4 @@
+
 export const navLinks = [
   { href: "/", label: "Início", icon: "Home" },
   { href: "/sobre", label: "Sobre Nós", icon: "Info" },
@@ -81,6 +82,10 @@ export const footerContent = {
   copyright: "Frigorífico Frango Dourado Ltda. Todos os direitos reservados.",
   address: "Rua Sizenando Carneiro Leão 10, Carpina - PE, Brasil",
   contact: "Telefone: (81) 3621-1544 | Email: contato@frangodourado.com.br",
+  socialLinks: [
+    { name: "Facebook", url: "https://www.facebook.com" },
+    { name: "Instagram", url: "https://www.instagram.com" },
+  ],
 };
 
 export const pageContentsForAI = {

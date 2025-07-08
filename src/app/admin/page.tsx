@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Settings, ShoppingBag, Home, Award, Mail, MessageSquare } from "lucide-react";
+import { Shield, Settings, ShoppingBag, Home, Award, Mail, MessageSquare, Share2 } from "lucide-react";
 import AdminLogin from "./AdminLogin";
 import ProductManager from "./ProductManager";
 import AboutManager from "./AboutManager";
@@ -10,9 +10,10 @@ import HomeManager from "./HomeManager";
 import QualityManager from "./QualityManager";
 import ContactManager from "./ContactManager";
 import MessagesManager from "./MessagesManager";
+import FooterManager from "./FooterManager";
 import { Button } from "@/components/ui/button";
 
-type ActiveManager = 'products' | 'about' | 'home' | 'quality' | 'contact' | 'messages';
+type ActiveManager = 'products' | 'about' | 'home' | 'quality' | 'contact' | 'messages' | 'footer';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,6 +63,10 @@ export default function AdminPage() {
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Gerenciar Mensagens
                 </Button>
+                <Button onClick={() => setActiveManager('footer')} variant={activeManager === 'footer' ? 'default' : 'outline'}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Gerenciar Rodapé
+                </Button>
             </div>
         </div>
         
@@ -72,6 +77,7 @@ export default function AdminPage() {
           {activeManager === 'quality' && <QualityManager />}
           {activeManager === 'contact' && <ContactManager />}
           {activeManager === 'messages' && <MessagesManager />}
+          {activeManager === 'footer' && <FooterManager />}
           {!activeManager && (
             <div className="text-center py-20 bg-card rounded-lg shadow-sm">
                 <h2 className="text-2xl font-semibold text-muted-foreground">Selecione uma área para gerenciar.</h2>
