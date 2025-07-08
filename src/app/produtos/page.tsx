@@ -37,7 +37,7 @@ export default function ProdutosPage() {
             </CardContent>
             <CardFooter>
                 <Button asChild className="w-full" variant="secondary">
-                  <Link href="/contato">Saiba Mais</Link>
+                  <Link href={`/contato?produto=${encodeURIComponent(product.name)}`}>Saiba Mais</Link>
                 </Button>
             </CardFooter>
           </Card>

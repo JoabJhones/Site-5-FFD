@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { handleContactSubmit } from "./actions";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -19,6 +21,9 @@ const formSchema = z.object({
 
 export default function ContactForm() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const productName = searchParams.get('produto');
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,6 +33,12 @@ export default function ContactForm() {
       message: "",
     },
   });
+
+  useEffect(() => {
+    if (productName) {
+      form.setValue('subject', `Interesse no produto: ${productName}`);
+    }
+  }, [productName, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const result = await handleContactSubmit(values);
