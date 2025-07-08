@@ -17,6 +17,9 @@ const OptimizeWebsiteContentInputSchema = z.object({
   currentDescription: z.string().describe('The current description of the page.'),
   trafficData: z.string().describe('JSON string of traffic data for the page (e.g., page views, bounce rate).'),
   engagementData: z.string().describe('JSON string of user engagement data (e.g., time on page, scroll depth).'),
+  imageDataUri: z.string().optional().describe(
+    "An optional image or video of the product/page, as a data URI that must include a MIME type and use Base64 encoding (e.g., 'data:<mimetype>;base64,<encoded_data>') or a public URL."
+  ),
 });
 export type OptimizeWebsiteContentInput = z.infer<typeof OptimizeWebsiteContentInputSchema>;
 
@@ -38,6 +41,7 @@ const optimizeWebsiteContentPrompt = ai.definePrompt({
   prompt: `You are an AI assistant specialized in website content optimization for SEO and user engagement.
 
 You will receive the current title and description of a page, along with traffic and engagement data.
+{{#if imageDataUri}}You will also receive an image or video related to the page content. Use this visual information to enrich your suggestions.{{/if}}
 Based on this information, you will suggest an optimized title and description, and explain your reasoning.
 
 Page Name: {{{pageName}}}
@@ -45,6 +49,9 @@ Current Title: {{{currentTitle}}}
 Current Description: {{{currentDescription}}}
 Traffic Data: {{{trafficData}}}
 Engagement Data: {{{engagementData}}}
+{{#if imageDataUri}}
+Media Content: {{media url=imageDataUri}}
+{{/if}}
 
 Optimize the title and description to improve SEO and user engagement. Consider factors such as keyword relevance, click-through rate, and time on page.
 Provide a clear rationale for your suggestions.

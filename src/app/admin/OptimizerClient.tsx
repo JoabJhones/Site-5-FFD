@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { handleOptimizeContent } from "./actions";
@@ -29,6 +31,9 @@ export default function OptimizerClient() {
   const [optimizationResult, setOptimizationResult] = useState<OptimizeWebsiteContentOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [mediaForUpload, setMediaForUpload] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof optimizerSchema>>({
     resolver: zodResolver(optimizerSchema),
@@ -37,6 +42,32 @@ export default function OptimizerClient() {
       engagementData: '{"timeOnPage": "1m 15s", "scrollDepth": "70%"}',
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        setMediaPreview(dataUri);
+        setMediaForUpload(dataUri);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setMediaPreview(null);
+      setMediaForUpload(null);
+    }
+  };
+
+  const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const url = event.target.value;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      setMediaPreview(url);
+    } else {
+      setMediaPreview(null);
+    }
+    setMediaForUpload(url);
+  };
 
   const handlePageChange = (page: PageName) => {
     const content = pageContentsForAI[page];
@@ -52,7 +83,12 @@ export default function OptimizerClient() {
     setError(null);
     setOptimizationResult(null);
 
-    const result = await handleOptimizeContent(values);
+    const payload = {
+      ...values,
+      imageDataUri: mediaForUpload || undefined,
+    };
+
+    const result = await handleOptimizeContent(payload);
 
     if (result.success && result.data) {
       setOptimizationResult(result.data);
@@ -68,7 +104,7 @@ export default function OptimizerClient() {
         <CardHeader>
           <CardTitle>Otimizador de Conteúdo com IA</CardTitle>
           <CardDescription>
-            Selecione uma página para otimizar o título e a descrição usando IA para melhorar o SEO e o engajamento.
+            Selecione uma página, forneça os dados e opcionalmente uma mídia para otimizar o conteúdo usando IA.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,6 +158,42 @@ export default function OptimizerClient() {
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-2">
+                <FormLabel>Mídia (Opcional)</FormLabel>
+                <RadioGroup value={uploadType} onValueChange={(v: 'url' | 'local') => { setUploadType(v); setMediaPreview(null); setMediaForUpload(null); }} className="flex space-x-4 pb-2">
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <RadioGroupItem value="url" id="r1"/>
+                    </FormControl>
+                    <Label htmlFor="r1">Via URL</Label>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <RadioGroupItem value="local" id="r2"/>
+                    </FormControl>
+                    <Label htmlFor="r2">Upload Local</Label>
+                  </FormItem>
+                </RadioGroup>
+                
+                {uploadType === 'url' ? (
+                  <Input placeholder="https://exemplo.com/imagem.png" onChange={handleUrlChange} />
+                ) : (
+                  <Input type="file" accept="image/*,video/*" onChange={handleFileChange} className="file:text-primary file:font-semibold" />
+                )}
+
+                {mediaPreview && (
+                    <div className="mt-4 p-4 border rounded-lg flex flex-col items-center justify-center bg-muted/50">
+                        <h4 className="font-semibold mb-2 self-start">Pré-visualização da Mídia:</h4>
+                        {mediaPreview.startsWith('data:video') || mediaPreview.endsWith('.mp4') ? (
+                            <video src={mediaPreview} controls className="rounded-md border max-h-60" />
+                        ) : (
+                            <img src={mediaPreview} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />
+                        )}
+                    </div>
+                )}
+              </div>
+
               <FormField
                 control={form.control}
                 name="trafficData"
