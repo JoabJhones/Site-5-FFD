@@ -14,7 +14,7 @@ export default function Home() {
           alt="Cortes de frango"
           layout="fill"
           objectFit="cover"
-          className="absolute z-0 brightness-50"
+          className="absolute z-0 brightness-60"
           data-ai-hint="chicken cuts"
         />
         <div className="relative z-10 p-4 animate-fade-in-up">
