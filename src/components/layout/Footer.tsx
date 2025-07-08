@@ -14,7 +14,7 @@ const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.585-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.585-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.585.069-4.85c.149-3.225 1.664-4.771 4.919-4.919C8.415 2.175 8.796 2.163 12 2.163zm0 1.441c-3.141 0-3.504.012-4.71.068-2.7.123-3.972 1.393-4.096 4.096-.055 1.205-.067 1.562-.067 4.71s.012 3.505.067 4.71c.124 2.703 1.396 3.972 4.096 4.096 1.206.055 1.569.067 4.71.067s3.504-.012 4.71-.067c2.7-.124 3.972-1.393 4.096-4.096.055-1.205.067-1.562.067-4.71s-.012-3.505-.067-4.71c-.124-2.703-1.396-3.972-4.096-4.096-1.206-.055-1.569-.067-4.71-.067zm0 3.843c-2.403 0-4.35 1.947-4.35 4.35s1.947 4.35 4.35 4.35 4.35-1.947 4.35-4.35-1.947-4.35-4.35-4.35zm0 7.252c-1.601 0-2.901-1.3-2.901-2.901s1.3-2.901 2.901-2.901 2.901 1.3 2.901 2.901-1.3 2.901-2.901-2.901zm4.65-6.72c-.777 0-1.408.631-1.408 1.408s.631 1.408 1.408 1.408c.777 0 1.408-.631 1.408-1.408s-.631-1.408-1.408-1.408z" />
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.585-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.585-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.585.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.415 2.175 8.796 2.163 12 2.163zm0 1.441c-3.141 0-3.504.012-4.71.068-2.7.123-3.972 1.393-4.096 4.096-.055 1.205-.067 1.562-.067 4.71s.012 3.505.067 4.71c.124 2.703 1.396 3.972 4.096 4.096 1.206.055 1.569.067 4.71.067s3.504-.012 4.71-.067c2.7-.124 3.972-1.393 4.096-4.096.055-1.205.067-1.562.067-4.71s-.012-3.505-.067-4.71c-.124-2.703-1.396-3.972-4.096-4.096-1.206-.055-1.569-.067-4.71-.067zm0 3.843c-2.403 0-4.35 1.947-4.35 4.35s1.947 4.35 4.35 4.35 4.35-1.947 4.35-4.35-1.947-4.35-4.35-4.35zm0 7.252c-1.601 0-2.901-1.3-2.901-2.901s1.3-2.901 2.901-2.901 2.901 1.3 2.901 2.901-1.3 2.901-2.901-2.901zm4.65-6.72c-.777 0-1.408.631-1.408 1.408s.631 1.408 1.408 1.408c.777 0 1.408-.631 1.408-1.408s-.631-1.408-1.408-1.408z" />
     </svg>
 );
 
@@ -62,27 +62,27 @@ export default function Footer() {
 
   return (
     <footer className="bg-foreground text-background">
-      <div className="container mx-auto py-8 px-6 text-center">
-        <p className="font-semibold">
+      <div className="container mx-auto py-6 px-6 text-center">
+        <p className="text-sm font-semibold">
           {isClient ? `© ${new Date().getFullYear()} ${footerContent.copyright}` : <>&nbsp;</>}
         </p>
-        <p className="text-sm mt-2 opacity-80">{footerContent.address}</p>
-        <p className="text-sm mt-1 opacity-80">{footerContent.contact}</p>
-        <div className="flex justify-center space-x-4 mt-4">
+        <p className="text-xs mt-2 opacity-80">{footerContent.address}</p>
+        <p className="text-xs mt-1 opacity-80">{footerContent.contact}</p>
+        <div className="flex justify-center space-x-4 mt-3">
             {footerContent.socialLinks.map((link) => {
                 const IconComponent = socialIcons[link.name as SocialIconName];
                 if (!IconComponent) return null;
                 return (
                     <Link key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-background hover:text-primary transition-colors">
-                        <IconComponent className="w-6 h-6" />
+                        <IconComponent className="w-5 h-5" />
                         <span className="sr-only">{link.name}</span>
                     </Link>
                 );
             })}
         </div>
         {showAdminButton && (
-          <div className="mt-6">
-            <Button asChild variant="ghost" className="text-background/70 hover:text-primary">
+          <div className="mt-4">
+            <Button asChild variant="ghost" size="sm" className="text-background/70 hover:text-primary">
               <Link href="/admin">Acesso Administrativo</Link>
             </Button>
           </div>
