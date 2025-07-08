@@ -58,7 +58,9 @@ export default function Footer() {
   return (
     <footer className="bg-foreground text-background">
       <div className="container mx-auto py-8 px-6 text-center">
-        <p className="font-semibold">&copy; {isClient ? new Date().getFullYear() : ''} {footerContent.copyright}</p>
+        <p className="font-semibold">
+          {isClient ? `© ${new Date().getFullYear()} ${footerContent.copyright}` : <>&nbsp;</>}
+        </p>
         <p className="text-sm mt-2 opacity-80">{footerContent.address}</p>
         <p className="text-sm mt-1 opacity-80">{footerContent.contact}</p>
         <div className="flex justify-center space-x-4 mt-4">
