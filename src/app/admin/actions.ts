@@ -1,21 +1,8 @@
 "use server";
 
-import { optimizeWebsiteContent, type OptimizeWebsiteContentInput, type OptimizeWebsiteContentOutput } from "@/ai/flows/optimize-website-content";
 import { Resend } from 'resend';
 import { z } from 'zod';
 import { markAsReplied } from '@/lib/messagesStore';
-
-export async function handleOptimizeContent(
-  input: OptimizeWebsiteContentInput
-): Promise<{ success: boolean; data?: OptimizeWebsiteContentOutput, error?: string }> {
-  try {
-    const result = await optimizeWebsiteContent(input);
-    return { success: true, data: result };
-  } catch (e: any) {
-    console.error("Error optimizing content:", e);
-    return { success: false, error: e.message || "An unexpected error occurred." };
-  }
-}
 
 const replySchema = z.object({
     to: z.string().email(),
