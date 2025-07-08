@@ -25,7 +25,9 @@ export default function Footer() {
 
   useEffect(() => {
     setYear(new Date().getFullYear());
-    
+  }, []);
+
+  useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;
