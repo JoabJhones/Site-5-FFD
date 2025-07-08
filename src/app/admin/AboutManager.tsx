@@ -39,7 +39,7 @@ export default function AboutManager() {
 
   const form = useForm<z.infer<typeof aboutSchema>>({
     resolver: zodResolver(aboutSchema),
-    defaultValues: aboutData,
+    defaultValues: aboutPageContent,
   });
   
   const { fields, append, remove } = useFieldArray({
