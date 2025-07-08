@@ -21,7 +21,7 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function Footer() {
   const [input, setInput] = useState('');
   const router = useRouter();
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [year, setYear] = useState<number | null>(null);
 
   useEffect(() => {
     setYear(new Date().getFullYear());
