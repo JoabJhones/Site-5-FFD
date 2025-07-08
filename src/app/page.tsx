@@ -14,14 +14,14 @@ export default function Home() {
           alt="Cortes de frango"
           layout="fill"
           objectFit="cover"
-          className="absolute z-0 brightness-60"
+          className="absolute z-0 brightness-50"
           data-ai-hint={homePageContent.heroMediaHint}
         />
         <div className="relative z-10 p-4 animate-fade-in-up">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight [text-shadow:0_0_12px_rgba(0,0,0,0.8)]">
             {homePageContent.title}
           </h1>
-          <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl drop-shadow-md">
+          <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl [text-shadow:0_0_8px_rgba(0,0,0,0.8)]">
             {homePageContent.description}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
