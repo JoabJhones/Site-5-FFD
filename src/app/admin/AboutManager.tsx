@@ -13,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { PlusCircle, Trash2, Save } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
-import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -26,7 +25,7 @@ const aboutSchema = z.object({
   title: z.string().min(10, { message: 'O título principal deve ter pelo menos 10 caracteres.' }),
   history1: z.string().min(20, { message: 'O primeiro parágrafo da história deve ter pelo menos 20 caracteres.' }),
   history2: z.string().min(20, { message: 'O segundo parágrafo da história deve ter pelo menos 20 caracteres.' }),
-  image: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).min(1, { message: 'A imagem é obrigatória.' }),
+  image: z.string().url({ message: 'Por favor, insira uma URL de mídia válida.' }).min(1, { message: 'A mídia é obrigatória.' }),
   imageHint: z.string().min(2, { message: 'A dica de IA é necessária.' }),
   values: z.array(valueSchema),
 });
@@ -134,7 +133,7 @@ export default function AboutManager() {
             />
 
             <div className="space-y-2">
-                <FormLabel className="text-lg font-semibold">Imagem da Página</FormLabel>
+                <FormLabel className="text-lg font-semibold">Mídia da Página</FormLabel>
                 <RadioGroup
                     value={uploadType}
                     onValueChange={(v: 'url' | 'local') => {
@@ -160,11 +159,11 @@ export default function AboutManager() {
                         <FormItem>
                             <FormControl>
                                 {uploadType === 'url' ? (
-                                    <Input placeholder="https://exemplo.com/imagem.png" {...field} />
+                                    <Input placeholder="https://exemplo.com/midia.png" {...field} />
                                 ) : (
                                     <Input
                                         type="file"
-                                        accept="image/*"
+                                        accept="image/*,video/*"
                                         onChange={handleImageFileChange}
                                         className="file:text-primary file:font-semibold"
                                     />
@@ -176,15 +175,14 @@ export default function AboutManager() {
                 />
 
                 {imagePreview && (
-                    <div className="mt-2 p-2 border rounded-lg flex justify-center bg-muted/50">
-                        <Image
-                            src={imagePreview}
-                            alt="Pré-visualização da imagem"
-                            width={150}
-                            height={150}
-                            className="rounded-md border object-contain"
-                        />
-                    </div>
+                  <div className="mt-4 p-4 border rounded-lg flex flex-col items-center justify-center bg-muted/50">
+                    <h4 className="font-semibold mb-2 self-start">Pré-visualização da Mídia:</h4>
+                    {imagePreview.startsWith('data:video') || imagePreview.endsWith('.mp4') ? (
+                        <video src={imagePreview} controls className="rounded-md border max-h-60" />
+                    ) : (
+                        <img src={imagePreview} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -193,7 +191,7 @@ export default function AboutManager() {
               name="imageHint"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dica de IA (para imagem)</FormLabel>
+                  <FormLabel>Dica de IA (para mídia)</FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: company history" {...field} />
                   </FormControl>
