@@ -16,6 +16,7 @@ import { handleOptimizeContent } from "./actions";
 import type { OptimizeWebsiteContentOutput } from "@/ai/flows/optimize-website-content";
 import { pageContentsForAI } from "@/lib/content";
 import { Wand2, BrainCircuit, Loader2 } from "lucide-react";
+import ProductManager from "./ProductManager";
 
 const optimizerSchema = z.object({
   pageName: z.string({ required_error: "Por favor, selecione uma página." }),
@@ -42,6 +43,8 @@ export default function OptimizerClient() {
       engagementData: '{"timeOnPage": "1m 15s", "scrollDepth": "70%"}',
     },
   });
+
+  const selectedPage = form.watch("pageName");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -99,178 +102,185 @@ export default function OptimizerClient() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>Otimizador de Conteúdo com IA</CardTitle>
-          <CardDescription>
-            Selecione uma página, forneça os dados e opcionalmente uma mídia para otimizar o conteúdo usando IA.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="pageName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Página para Otimizar</FormLabel>
-                    <Select onValueChange={(value: PageName) => handlePageChange(value)} defaultValue={field.value}>
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Otimizador de Conteúdo com IA</CardTitle>
+            <CardDescription>
+              Selecione uma página, forneça os dados e opcionalmente uma mídia para otimizar o conteúdo usando IA.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="pageName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Página para Otimizar</FormLabel>
+                      <Select onValueChange={(value: PageName) => handlePageChange(value)} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma página" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.keys(pageContentsForAI).map(page => (
+                              <SelectItem key={page} value={page}>{page.charAt(0).toUpperCase() + page.slice(1)}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="currentTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Título Atual</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma página" />
-                        </SelectTrigger>
+                        <Input {...field} readOnly />
                       </FormControl>
-                      <SelectContent>
-                        {Object.keys(pageContentsForAI).map(page => (
-                            <SelectItem key={page} value={page}>{page.charAt(0).toUpperCase() + page.slice(1)}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="currentTitle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Título Atual</FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="currentDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição Atual</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={5} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="currentDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição Atual</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={5} readOnly />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="space-y-2">
-                <FormLabel>Mídia (Opcional)</FormLabel>
-                <RadioGroup value={uploadType} onValueChange={(v: 'url' | 'local') => { setUploadType(v); setMediaPreview(null); setMediaForUpload(null); }} className="flex space-x-4 pb-2">
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="url" id="r1"/>
-                    </FormControl>
-                    <Label htmlFor="r1">Via URL</Label>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="local" id="r2"/>
-                    </FormControl>
-                    <Label htmlFor="r2">Upload Local</Label>
-                  </FormItem>
-                </RadioGroup>
-                
-                {uploadType === 'url' ? (
-                  <Input placeholder="https://exemplo.com/imagem.png" onChange={handleUrlChange} />
-                ) : (
-                  <Input type="file" accept="image/*,video/*" onChange={handleFileChange} className="file:text-primary file:font-semibold" />
-                )}
+                <div className="space-y-2">
+                  <FormLabel>Mídia (Opcional)</FormLabel>
+                  <RadioGroup value={uploadType} onValueChange={(v: 'url' | 'local') => { setUploadType(v); setMediaPreview(null); setMediaForUpload(null); }} className="flex space-x-4 pb-2">
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="url" id="r1"/>
+                      </FormControl>
+                      <Label htmlFor="r1">Via URL</Label>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <RadioGroupItem value="local" id="r2"/>
+                      </FormControl>
+                      <Label htmlFor="r2">Upload Local</Label>
+                    </FormItem>
+                  </RadioGroup>
+                  
+                  {uploadType === 'url' ? (
+                    <Input placeholder="https://exemplo.com/imagem.png" onChange={handleUrlChange} />
+                  ) : (
+                    <Input type="file" accept="image/*,video/*" onChange={handleFileChange} className="file:text-primary file:font-semibold" />
+                  )}
 
-                {mediaPreview && (
-                    <div className="mt-4 p-4 border rounded-lg flex flex-col items-center justify-center bg-muted/50">
-                        <h4 className="font-semibold mb-2 self-start">Pré-visualização da Mídia:</h4>
-                        {mediaPreview.startsWith('data:video') || mediaPreview.endsWith('.mp4') ? (
-                            <video src={mediaPreview} controls className="rounded-md border max-h-60" />
-                        ) : (
-                            <img src={mediaPreview} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />
-                        )}
-                    </div>
-                )}
-              </div>
+                  {mediaPreview && (
+                      <div className="mt-4 p-4 border rounded-lg flex flex-col items-center justify-center bg-muted/50">
+                          <h4 className="font-semibold mb-2 self-start">Pré-visualização da Mídia:</h4>
+                          {mediaPreview.startsWith('data:video') || mediaPreview.endsWith('.mp4') ? (
+                              <video src={mediaPreview} controls className="rounded-md border max-h-60" />
+                          ) : (
+                              <img src={mediaPreview} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />
+                          )}
+                      </div>
+                  )}
+                </div>
 
-              <FormField
-                control={form.control}
-                name="trafficData"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dados de Tráfego (JSON)</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="engagementData"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dados de Engajamento (JSON)</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} rows={3} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                {isLoading ? "Otimizando..." : "Otimizar com IA"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-      
-      <div className="space-y-8">
-        {isLoading && (
-            <Card className="flex flex-col items-center justify-center p-12 text-center shadow-lg animate-pulse">
-                <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                <p className="mt-4 text-lg font-medium text-muted-foreground">A IA está trabalhando... Gerando sugestões...</p>
+                <FormField
+                  control={form.control}
+                  name="trafficData"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dados de Tráfego (JSON)</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="engagementData"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dados de Engajamento (JSON)</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                  {isLoading ? "Otimizando..." : "Otimizar com IA"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+        
+        <div className="space-y-8">
+          {isLoading && (
+              <Card className="flex flex-col items-center justify-center p-12 text-center shadow-lg animate-pulse">
+                  <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                  <p className="mt-4 text-lg font-medium text-muted-foreground">A IA está trabalhando... Gerando sugestões...</p>
+              </Card>
+          )}
+          {error && (
+            <Card className="bg-destructive/10 border-destructive shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-destructive">Erro na Otimização</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>{error}</p>
+              </CardContent>
             </Card>
-        )}
-        {error && (
-          <Card className="bg-destructive/10 border-destructive shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-destructive">Erro na Otimização</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{error}</p>
-            </CardContent>
-          </Card>
-        )}
-        {optimizationResult && (
-          <Card className="shadow-lg border-primary bg-primary/5 animate-fade-in-up">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <Wand2 /> Sugestões da IA
-              </CardTitle>
-              <CardDescription>Abaixo estão as otimizações recomendadas pela IA.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Título Otimizado</h3>
-                <p className="p-4 bg-background rounded-md border">{optimizationResult.optimizedTitle}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Descrição Otimizada</h3>
-                <p className="p-4 bg-background rounded-md border">{optimizationResult.optimizedDescription}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-2 flex items-center gap-2"><BrainCircuit /> Racional da IA</h3>
-                <p className="p-4 bg-background rounded-md border text-muted-foreground">{optimizationResult.optimizationRationale}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          )}
+          {optimizationResult && (
+            <Card className="shadow-lg border-primary bg-primary/5 animate-fade-in-up">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <Wand2 /> Sugestões da IA
+                </CardTitle>
+                <CardDescription>Abaixo estão as otimizações recomendadas pela IA.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Título Otimizado</h3>
+                  <p className="p-4 bg-background rounded-md border">{optimizationResult.optimizedTitle}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Descrição Otimizada</h3>
+                  <p className="p-4 bg-background rounded-md border">{optimizationResult.optimizedDescription}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg mb-2 flex items-center gap-2"><BrainCircuit /> Racional da IA</h3>
+                  <p className="p-4 bg-background rounded-md border text-muted-foreground">{optimizationResult.optimizationRationale}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
-    </div>
+      {selectedPage === 'products' && (
+        <div className="mt-12">
+          <ProductManager />
+        </div>
+      )}
+    </>
   );
 }

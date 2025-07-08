@@ -4,9 +4,6 @@ import { useState } from "react";
 import { Shield } from "lucide-react";
 import OptimizerClient from "./OptimizerClient";
 import AdminLogin from "./AdminLogin";
-import ProductManager from "./ProductManager";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,18 +29,7 @@ export default function AdminPage() {
             </div>
         </div>
         
-        <Tabs defaultValue="optimizer" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mb-6">
-            <TabsTrigger value="optimizer">Otimizador de Conteúdo</TabsTrigger>
-            <TabsTrigger value="products">Gerenciador de Produtos</TabsTrigger>
-          </TabsList>
-          <TabsContent value="optimizer">
-            <OptimizerClient />
-          </TabsContent>
-          <TabsContent value="products">
-            <ProductManager />
-          </TabsContent>
-        </Tabs>
+        <OptimizerClient />
 
       </div>
     </div>
