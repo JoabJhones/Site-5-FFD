@@ -29,7 +29,7 @@ export default function ProdutosPage() {
               />
             </div>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-foreground">{product.name}</CardTitle>
+              <CardTitle className="text-2xl font-semibold text-foreground">{product.name}</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow">
               <p className="text-muted-foreground">{product.description}</p>

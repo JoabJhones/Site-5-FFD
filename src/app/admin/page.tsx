@@ -31,7 +31,7 @@ export default function AdminPage() {
             <div className="flex items-center gap-4">
                 <Shield className="h-10 w-10 text-primary" />
                 <div>
-                    <h1 className="text-4xl font-bold">Painel de Administração</h1>
+                    <h1 className="text-4xl font-semibold">Painel de Administração</h1>
                     <p className="text-muted-foreground">Gerencie o conteúdo do seu site.</p>
                 </div>
             </div>

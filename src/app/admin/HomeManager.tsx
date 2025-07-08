@@ -85,7 +85,7 @@ export default function HomeManager() {
   return (
     <Card className="shadow-lg animate-fade-in-up">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Gerenciador da Página "Início"</CardTitle>
+        <CardTitle className="text-2xl font-semibold">Gerenciador da Página "Início"</CardTitle>
         <CardDescription>Edite o conteúdo que aparece na página inicial do seu site.</CardDescription>
       </CardHeader>
       <CardContent>

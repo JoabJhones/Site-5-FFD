@@ -46,7 +46,7 @@ export default function ContactManager() {
   return (
     <Card className="shadow-lg animate-fade-in-up">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Gerenciador da Página "Contato"</CardTitle>
+        <CardTitle className="text-2xl font-semibold">Gerenciador da Página "Contato"</CardTitle>
         <CardDescription>Edite as informações de contato que aparecem no seu site.</CardDescription>
       </CardHeader>
       <CardContent>

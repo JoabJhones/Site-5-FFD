@@ -18,7 +18,7 @@ export default function ContatoPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">{contactPageContent.formTitle}</CardTitle>
+            <CardTitle className="text-3xl font-semibold">{contactPageContent.formTitle}</CardTitle>
           </CardHeader>
           <CardContent>
             <ContactForm />
@@ -28,7 +28,7 @@ export default function ContatoPage() {
         <div className="space-y-8">
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold">{contactPageContent.detailsTitle}</CardTitle>
+              <CardTitle className="text-3xl font-semibold">{contactPageContent.detailsTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-lg">
               <p className="flex items-center gap-3">

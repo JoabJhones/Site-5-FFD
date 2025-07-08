@@ -84,7 +84,7 @@ export default function AboutManager() {
   return (
     <Card className="shadow-lg animate-fade-in-up">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Gerenciador da Página "Sobre Nós"</CardTitle>
+        <CardTitle className="text-2xl font-semibold">Gerenciador da Página "Sobre Nós"</CardTitle>
         <CardDescription>Edite o conteúdo que aparece na página "Sobre Nós" do seu site.</CardDescription>
       </CardHeader>
       <CardContent>

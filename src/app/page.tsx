@@ -44,7 +44,7 @@ export default function Home() {
                   <div className="mx-auto bg-primary/10 text-primary rounded-full p-3 w-fit">
                     <CheckCircle className="h-8 w-8" />
                   </div>
-                  <CardTitle className="mt-4 text-2xl font-bold">{feature.title}</CardTitle>
+                  <CardTitle className="mt-4 text-2xl font-semibold">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">{feature.description}</p>

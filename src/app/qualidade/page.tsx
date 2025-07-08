@@ -17,13 +17,13 @@ export default function QualidadePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
         <div className="space-y-8">
           <div>
-            <h2 className="text-3xl font-bold mb-3">{qualityPageContent.section1Title}</h2>
+            <h2 className="text-3xl font-semibold mb-3">{qualityPageContent.section1Title}</h2>
             <p className="text-lg text-foreground/80 leading-relaxed">
               {qualityPageContent.section1Content}
             </p>
           </div>
           <div>
-            <h2 className="text-3xl font-bold mb-3">{qualityPageContent.section2Title}</h2>
+            <h2 className="text-3xl font-semibold mb-3">{qualityPageContent.section2Title}</h2>
             <p className="text-lg text-foreground/80 leading-relaxed">
               {qualityPageContent.section2Content}
             </p>
@@ -42,7 +42,7 @@ export default function QualidadePage() {
       </div>
 
       <div className="text-center bg-card p-8 md:p-12 rounded-lg shadow-xl">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Nosso Processo de Qualidade</h2>
+        <h2 className="text-3xl md:text-4xl font-semibold mb-8">Nosso Processo de Qualidade</h2>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left max-w-4xl mx-auto">
           {qualityPageContent.processSteps.map((step, index) => (
             <li key={index} className="flex items-start space-x-3 text-lg">

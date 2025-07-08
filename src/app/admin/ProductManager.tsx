@@ -138,7 +138,7 @@ export default function ProductManager() {
   return (
     <div>
         <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Produtos Cadastrados</h2>
+            <h2 className="text-2xl font-semibold">Produtos Cadastrados</h2>
             <Button onClick={handleAddNew}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Adicionar Produto

@@ -58,7 +58,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
           <div className="mx-auto bg-primary/10 text-primary rounded-full p-3 w-fit mb-4">
               <Shield className="h-8 w-8" />
           </div>
-          <CardTitle className="text-2xl">Acesso Restrito</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Acesso Restrito</CardTitle>
           <CardDescription>Faça login para acessar o painel administrativo.</CardDescription>
         </CardHeader>
         <CardContent>
