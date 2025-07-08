@@ -36,7 +36,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Edit, Trash2, Loader2, RefreshCw } from 'lucide-react';
-import Image from 'next/image';
 import { useToast } from "@/hooks/use-toast";
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -215,11 +214,10 @@ export default function ProductManager() {
               products.map(product => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <Image
+                    <img
                       src={product.image}
                       alt={product.name}
-                      width={64}
-                      height={64}
+                      style={{ width: '64px', height: '64px' }}
                       className="rounded-md object-cover"
                       data-ai-hint={product.hint}
                     />
@@ -348,11 +346,10 @@ export default function ProductManager() {
 
                 {imagePreview && (
                     <div className="mt-2 p-2 border rounded-lg flex justify-center bg-muted/50">
-                        <Image
+                        <img
                             src={imagePreview}
                             alt="Pré-visualização do produto"
-                            width={100}
-                            height={100}
+                            style={{width: '100px', height: '100px'}}
                             className="rounded-md border object-contain"
                         />
                     </div>
