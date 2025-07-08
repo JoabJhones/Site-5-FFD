@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { productsPageContent } from '@/lib/content';
@@ -35,7 +36,9 @@ export default function ProdutosPage() {
               <p className="text-muted-foreground">{product.description}</p>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" variant="secondary">Saiba Mais</Button>
+                <Button asChild className="w-full" variant="secondary">
+                  <Link href="/contato">Saiba Mais</Link>
+                </Button>
             </CardFooter>
           </Card>
         ))}
