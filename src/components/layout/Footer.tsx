@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -64,7 +63,7 @@ export default function Footer() {
     <footer className="bg-foreground text-background">
       <div className="container mx-auto py-6 px-6 text-center">
         <p className="text-sm font-semibold">
-          {isClient ? `© ${new Date().getFullYear()} ${footerContent.copyright}` : <>&nbsp;</>}
+          {isClient && `© ${new Date().getFullYear()} ${footerContent.copyright}`}
         </p>
         <p className="text-xs mt-2 opacity-80">{footerContent.address}</p>
         <p className="text-xs mt-1 opacity-80">{footerContent.contact}</p>
