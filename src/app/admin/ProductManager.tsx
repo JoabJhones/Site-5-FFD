@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -214,10 +215,11 @@ export default function ProductManager() {
               products.map(product => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <img
+                    <Image
                       src={product.image}
                       alt={product.name}
-                      style={{ width: '64px', height: '64px' }}
+                      width={64}
+                      height={64}
                       className="rounded-md object-cover"
                       data-ai-hint={product.hint}
                     />
@@ -346,10 +348,11 @@ export default function ProductManager() {
 
                 {imagePreview && (
                     <div className="mt-2 p-2 border rounded-lg flex justify-center bg-muted/50">
-                        <img
+                        <Image
                             src={imagePreview}
                             alt="Pré-visualização do produto"
-                            style={{width: '100px', height: '100px'}}
+                            width={100}
+                            height={100}
                             className="rounded-md border object-contain"
                         />
                     </div>
