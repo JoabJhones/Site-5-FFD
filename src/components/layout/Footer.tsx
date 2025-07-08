@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { footerContent } from '@/lib/content';
+import { Button } from '@/components/ui/button';
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg {...props} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -20,8 +20,8 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Footer() {
   const [input, setInput] = useState('');
-  const router = useRouter();
   const [year, setYear] = useState<number | null>(null);
+  const [showAdminButton, setShowAdminButton] = useState(false);
 
   useEffect(() => {
     setYear(new Date().getFullYear());
@@ -32,9 +32,11 @@ export default function Footer() {
       }
       
       const newKey = e.key.toLowerCase();
+      // Permite apenas caracteres alfabéticos para compor a palavra "admin"
       if (newKey.length === 1 && 'abcdefghijklmnopqrstuvwxyz'.includes(newKey)) {
         setInput(prev => (prev + newKey).slice(-5));
       } else if (newKey === 'backspace') {
+        // Permite apagar
         setInput(prev => prev.slice(0, -1));
       }
     };
@@ -45,10 +47,10 @@ export default function Footer() {
 
   useEffect(() => {
     if (input.toLowerCase() === 'admin') {
-      router.push('/admin');
+      setShowAdminButton(true);
       setInput(''); 
     }
-  }, [input, router]);
+  }, [input]);
 
 
   return (
@@ -65,6 +67,13 @@ export default function Footer() {
                 <InstagramIcon className="w-6 h-6" />
             </Link>
         </div>
+        {showAdminButton && (
+          <div className="mt-6">
+            <Button asChild variant="ghost" className="text-muted-foreground hover:text-primary">
+              <Link href="/admin">Acesso Administrativo</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </footer>
   );
