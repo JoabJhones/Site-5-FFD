@@ -2,7 +2,8 @@
 
 import { Resend } from 'resend';
 import { z } from 'zod';
-import { markAsReplied } from '@/lib/messagesStore';
+import { messagesDB, markAsReplied } from '@/lib/messagesStore';
+import type { ReceivedMessage } from '@/lib/messagesStore';
 
 const replySchema = z.object({
     to: z.string().email(),
@@ -30,7 +31,7 @@ export async function handleReplySubmit(values: z.infer<typeof replySchema>) {
             to: parsed.data.to,
             subject: `Re: ${parsed.data.subject}`,
             html: `
-              <p>Olá ${parsed.data.to.split('@')[0]},</p>
+              <p>Olá,</p>
               <p>Em resposta à sua mensagem sobre "${parsed.data.subject}":</p>
               <blockquote style="border-left: 2px solid #eee; padding-left: 1em; margin-left: 1em;">
                 ${parsed.data.html}
@@ -48,4 +49,10 @@ export async function handleReplySubmit(values: z.infer<typeof replySchema>) {
         console.error("Erro ao enviar email:", error);
         return { success: false, error: 'Ocorreu um erro ao enviar o e-mail.' };
     }
+}
+
+export async function getMessages(): Promise<ReceivedMessage[]> {
+  // Em uma aplicação real, aqui você buscaria os dados de um banco.
+  // Para o protótipo, apenas retornamos a nossa store em memória.
+  return messagesDB;
 }
