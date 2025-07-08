@@ -1,17 +1,69 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { productsPageContent } from '@/lib/content';
-
-type Product = typeof productsPageContent.products[0];
+import { getProducts, type Product } from '@/lib/productStore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProdutosPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const serverProducts = await getProducts();
+        setProducts(serverProducts);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+        // Optionally, show a toast or error message to the user
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const renderSkeleton = () => (
+    <div className="container mx-auto px-4 py-16 lg:py-24">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">
+          {productsPageContent.title}
+        </h1>
+        <p className="mt-4 max-w-3xl mx-auto text-lg text-foreground/80">
+          {productsPageContent.description}
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Card key={i} className="overflow-hidden flex flex-col">
+            <Skeleton className="h-56 w-full" />
+            <CardHeader>
+              <Skeleton className="h-7 w-3/4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-2/3" />
+            </CardContent>
+            <CardFooter>
+              <Skeleton className="h-10 w-full" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (isLoading) {
+    return renderSkeleton();
+  }
 
   return (
     <>
@@ -26,8 +78,8 @@ export default function ProdutosPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {productsPageContent.products.map((product) => (
-            <Card key={product.name} className="overflow-hidden flex flex-col group transform hover:-translate-y-2 transition-transform duration-300 shadow-lg hover:shadow-2xl">
+          {products.map((product) => (
+            <Card key={product.id} className="overflow-hidden flex flex-col group transform hover:-translate-y-2 transition-transform duration-300 shadow-lg hover:shadow-2xl">
               <div className="relative h-56 w-full">
                 <Image
                   src={product.image}

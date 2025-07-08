@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { productsPageContent } from '@/lib/content';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -36,13 +35,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from "@/hooks/use-toast";
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
-type Product = typeof productsPageContent.products[0];
+import { getProducts, addProduct, updateProduct, deleteProduct, type Product, type ProductInput } from '@/lib/productStore';
 
 const productSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
@@ -53,13 +51,14 @@ const productSchema = z.object({
 
 export default function ProductManager() {
   const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>(productsPageContent.products);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadType, setUploadType] = useState<'url' | 'local'>('url');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof productSchema>>({
+  const form = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '',
@@ -70,6 +69,26 @@ export default function ProductManager() {
   });
 
   const imageValue = form.watch('image');
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const serverProducts = await getProducts();
+      setProducts(serverProducts);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao carregar produtos',
+        description: 'Não foi possível buscar os produtos do servidor.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     if (imageValue && (imageValue.startsWith('http') || imageValue.startsWith('data:'))) {
@@ -97,52 +116,82 @@ export default function ProductManager() {
     setEditingProduct(null);
     form.reset({ name: '', description: '', image: '', hint: ''});
     setUploadType('url');
+    setImagePreview(null);
     setIsDialogOpen(true);
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     form.reset(product);
-    setUploadType('url');
+    setUploadType(product.image.startsWith('data:') ? 'local' : 'url');
+    setImagePreview(product.image);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (productName: string) => {
-    setProducts(products.filter(p => p.name !== productName));
-    toast({
-        title: "Produto Apagado!",
+  const handleDelete = async (productId: string, productName: string) => {
+    const result = await deleteProduct(productId);
+    if(result.success) {
+      toast({
+        title: 'Produto Apagado!',
         description: `O produto "${productName}" foi removido com sucesso.`,
-    });
-  };
-
-  const onSubmit = (values: z.infer<typeof productSchema>) => {
-    if (editingProduct) {
-      // Edit
-      setProducts(products.map(p => (p.name === editingProduct.name ? { ...p, ...values } : p)));
-      toast({
-        title: "Produto Atualizado!",
-        description: `O produto "${values.name}" foi atualizado com sucesso.`,
       });
+      await loadProducts();
     } else {
-      // Add
-      setProducts([...products, values]);
       toast({
-        title: "Produto Adicionado!",
-        description: `O produto "${values.name}" foi adicionado com sucesso.`,
+        variant: 'destructive',
+        title: 'Falha ao Apagar',
+        description: result.error || 'Não foi possível apagar o produto.',
       });
     }
-    setIsDialogOpen(false);
-    setEditingProduct(null);
+  };
+
+  const onSubmit = async (values: ProductInput) => {
+    let result;
+    if (editingProduct) {
+      result = await updateProduct(editingProduct.id, values);
+      if (result.success) {
+        toast({
+          title: "Produto Atualizado!",
+          description: `O produto "${values.name}" foi atualizado com sucesso.`,
+        });
+      }
+    } else {
+      result = await addProduct(values);
+      if (result.success) {
+        toast({
+          title: "Produto Adicionado!",
+          description: `O produto "${values.name}" foi adicionado com sucesso.`,
+        });
+      }
+    }
+
+    if (result.success) {
+      setIsDialogOpen(false);
+      setEditingProduct(null);
+      await loadProducts();
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Falha na Operação',
+        description: result.error || 'Ocorreu um erro ao salvar o produto.',
+      });
+    }
   };
 
   return (
     <div>
         <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Produtos Cadastrados</h2>
-            <Button onClick={handleAddNew}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Adicionar Produto
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={loadProducts} disabled={isLoading}>
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  {isLoading ? "Atualizando..." : "Atualizar"}
+              </Button>
+              <Button onClick={handleAddNew}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Adicionar Produto
+              </Button>
+            </div>
         </div>
 
       <div className="rounded-lg border bg-card">
@@ -156,50 +205,64 @@ export default function ProductManager() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map(product => (
-              <TableRow key={product.name}>
-                <TableCell>
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={64}
-                    height={64}
-                    className="rounded-md object-cover"
-                    data-ai-hint={product.hint}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell className="text-muted-foreground hidden md:table-cell">{product.description}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Editar</span>
-                  </Button>
-                  
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Apagar</span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Essa ação não pode ser desfeita. Isso irá apagar permanentemente o produto
-                             "{product.name}".
-                        </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(product.name)} className="bg-destructive hover:bg-destructive/90">Apagar</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
+            {isLoading ? (
+              <TableRow>
+                  <TableCell colSpan={4} className="h-24 text-center">
+                      <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+                  </TableCell>
               </TableRow>
-            ))}
+            ) : products.length > 0 ? (
+              products.map(product => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={64}
+                      height={64}
+                      className="rounded-md object-cover"
+                      data-ai-hint={product.hint}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell className="text-muted-foreground hidden md:table-cell">{product.description}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(product)}>
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Editar</span>
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Apagar</span>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                          <AlertDialogHeader>
+                          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                              Essa ação não pode ser desfeita. Isso irá apagar permanentemente o produto
+                              "{product.name}".
+                          </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(product.id, product.name)} className="bg-destructive hover:bg-destructive/90">Apagar</AlertDialogAction>
+                          </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+                <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                        Nenhum produto cadastrado.
+                    </TableCell>
+                </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
@@ -310,8 +373,10 @@ export default function ProductManager() {
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-                <Button type="submit">{editingProduct ? 'Salvar Alterações' : 'Adicionar Produto'}</Button>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={form.formState.isSubmitting}>Cancelar</Button>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (editingProduct ? 'Salvar Alterações' : 'Adicionar Produto')}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
