@@ -26,6 +26,7 @@ export default function AdminPage() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setActiveManager(null);
+    window.dispatchEvent(new Event('logout'));
   };
 
   if (!isAuthenticated) {

@@ -56,9 +56,18 @@ export default function Footer() {
         setInput(prev => prev.slice(0, -1));
       }
     };
+
+    const handleLogoutEvent = () => {
+      setShowAdminButton(false);
+    };
     
     window.addEventListener('keydown', onKeydown);
-    return () => window.removeEventListener('keydown', onKeydown);
+    window.addEventListener('logout', handleLogoutEvent);
+    
+    return () => {
+      window.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('logout', handleLogoutEvent);
+    };
   }, []);
 
   useEffect(() => {
