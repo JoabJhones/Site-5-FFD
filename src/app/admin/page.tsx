@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, Settings, ShoppingBag, Home, Award, Mail, MessageSquare, Share2 } from "lucide-react";
+import { Shield, Settings, ShoppingBag, Home, Award, Mail, MessageSquare, Share2, LogOut } from "lucide-react";
 import AdminLogin from "./AdminLogin";
 import ProductManager from "./ProductManager";
 import AboutManager from "./AboutManager";
@@ -23,6 +23,11 @@ export default function AdminPage() {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setActiveManager(null);
+  };
+
   if (!isAuthenticated) {
     return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
   }
@@ -30,7 +35,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-muted">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
                 <Shield className="h-10 w-10 text-primary" />
                 <div>
@@ -38,36 +43,41 @@ export default function AdminPage() {
                     <p className="text-muted-foreground">Gerencie o conteúdo e as mensagens do seu site.</p>
                 </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-                <Button onClick={() => setActiveManager('home')} variant={activeManager === 'home' ? 'default' : 'outline'}>
-                    <Home className="mr-2 h-4 w-4" />
-                    Gerenciar Início
-                </Button>
-                <Button onClick={() => setActiveManager('sobre')} variant={activeManager === 'sobre' ? 'default' : 'outline'}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Gerenciar Sobre Nós
-                </Button>
-                <Button onClick={() => setActiveManager('products')} variant={activeManager === 'products' ? 'default' : 'outline'}>
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    Gerenciar Produtos
-                </Button>
-                <Button onClick={() => setActiveManager('quality')} variant={activeManager === 'quality' ? 'default' : 'outline'}>
-                    <Award className="mr-2 h-4 w-4" />
-                    Gerenciar Qualidade
-                </Button>
-                <Button onClick={() => setActiveManager('contact')} variant={activeManager === 'contact' ? 'default' : 'outline'}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Gerenciar Contato
-                </Button>
-                <Button onClick={() => setActiveManager('messages')} variant={activeManager === 'messages' ? 'default' : 'outline'}>
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Gerenciar Mensagens
-                </Button>
-                <Button onClick={() => setActiveManager('footer')} variant={activeManager === 'footer' ? 'default' : 'outline'}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Gerenciar Rodapé
-                </Button>
-            </div>
+            <Button onClick={handleLogout} variant="outline">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sair
+            </Button>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setActiveManager('home')} variant={activeManager === 'home' ? 'default' : 'outline'}>
+                <Home className="mr-2 h-4 w-4" />
+                Gerenciar Início
+            </Button>
+            <Button onClick={() => setActiveManager('sobre')} variant={activeManager === 'sobre' ? 'default' : 'outline'}>
+                <Settings className="mr-2 h-4 w-4" />
+                Gerenciar Sobre Nós
+            </Button>
+            <Button onClick={() => setActiveManager('products')} variant={activeManager === 'products' ? 'default' : 'outline'}>
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                Gerenciar Produtos
+            </Button>
+            <Button onClick={() => setActiveManager('quality')} variant={activeManager === 'quality' ? 'default' : 'outline'}>
+                <Award className="mr-2 h-4 w-4" />
+                Gerenciar Qualidade
+            </Button>
+            <Button onClick={() => setActiveManager('contact')} variant={activeManager === 'contact' ? 'default' : 'outline'}>
+                <Mail className="mr-2 h-4 w-4" />
+                Gerenciar Contato
+            </Button>
+            <Button onClick={() => setActiveManager('messages')} variant={activeManager === 'messages' ? 'default' : 'outline'}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Gerenciar Mensagens
+            </Button>
+            <Button onClick={() => setActiveManager('footer')} variant={activeManager === 'footer' ? 'default' : 'outline'}>
+                <Share2 className="mr-2 h-4 w-4" />
+                Gerenciar Rodapé
+            </Button>
         </div>
         
         <div className="mt-8">
