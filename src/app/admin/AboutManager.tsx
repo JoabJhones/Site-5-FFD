@@ -31,6 +31,20 @@ const aboutSchema = z.object({
   values: z.array(valueSchema),
 });
 
+function getYouTubeEmbedUrl(url: string): string | null {
+    if (!url) return null;
+    let videoId = null;
+    if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/watch?v=')) {
+        videoId = new URLSearchParams(url.split('?')[1]).get('v');
+    } else if (url.includes('youtube.com/embed/')) {
+        videoId = url.split('embed/')[1].split('?')[0];
+    }
+    
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+}
+
 export default function AboutManager() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
@@ -69,10 +83,10 @@ export default function AboutManager() {
   const imageValue = form.watch('image');
   
   useEffect(() => {
-    if (imageValue && (imageValue.startsWith('http') || imageValue.startsWith('data:'))) {
-      setImagePreview(imageValue);
+    if (imageValue) {
+        setImagePreview(imageValue);
     } else {
-      setImagePreview(null);
+        setImagePreview(null);
     }
   }, [imageValue]);
 
@@ -131,6 +145,34 @@ export default function AboutManager() {
         </Card>
     );
   }
+
+  const renderPreview = (url: string) => {
+    const youtubeEmbedUrl = getYouTubeEmbedUrl(url);
+
+    if (youtubeEmbedUrl) {
+      return (
+        <iframe
+          width="100%"
+          height="315"
+          src={youtubeEmbedUrl}
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="rounded-md border aspect-video max-h-60"
+        ></iframe>
+      );
+    }
+
+    if (url.startsWith('data:video') || url.endsWith('.mp4')) {
+      return <video src={url} controls className="rounded-md border max-h-60" />;
+    }
+
+    if (url.startsWith('http') || url.startsWith('data:')) {
+      return <img src={url} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />;
+    }
+
+    return null;
+  };
 
   return (
     <Card className="shadow-lg animate-fade-in-up">
@@ -210,7 +252,7 @@ export default function AboutManager() {
                         <FormItem>
                             <FormControl>
                                 {uploadType === 'url' ? (
-                                    <Input placeholder="https://exemplo.com/midia.png" {...field} />
+                                    <Input placeholder="https://exemplo.com/midia.png ou link do YouTube" {...field} />
                                 ) : (
                                     <Input
                                         type="file"
@@ -228,11 +270,7 @@ export default function AboutManager() {
                 {imagePreview && (
                   <div className="mt-4 p-4 border rounded-lg flex flex-col items-center justify-center bg-muted/50">
                     <h4 className="font-semibold mb-2 self-start">Pré-visualização da Mídia:</h4>
-                    {imagePreview.startsWith('data:video') || imagePreview.endsWith('.mp4') ? (
-                        <video src={imagePreview} controls className="rounded-md border max-h-60" />
-                    ) : (
-                        <img src={imagePreview} alt="Pré-visualização da mídia" className="rounded-md border object-contain max-h-60" />
-                    )}
+                    {renderPreview(imagePreview)}
                   </div>
                 )}
               </div>

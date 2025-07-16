@@ -16,6 +16,61 @@ const valueIcons = {
 
 type ValueTitle = keyof typeof valueIcons;
 
+function getYouTubeEmbedUrl(url: string): string | null {
+    if (!url) return null;
+    let videoId = null;
+    if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/watch?v=')) {
+        videoId = new URLSearchParams(url.split('?')[1]).get('v');
+    } else if (url.includes('youtube.com/embed/')) {
+        videoId = url.split('embed/')[1].split('?')[0];
+    }
+    
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+}
+
+function renderMedia(content: AboutContent) {
+    const youtubeEmbedUrl = getYouTubeEmbedUrl(content.image);
+
+    if (youtubeEmbedUrl) {
+        return (
+            <div className="aspect-w-16 aspect-h-9 w-full max-w-[500px] mx-auto">
+                <iframe
+                    src={youtubeEmbedUrl}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500 w-full h-full"
+                ></iframe>
+            </div>
+        );
+    }
+
+    if (content.image.startsWith('data:video') || content.image.endsWith('.mp4')) {
+        return (
+            <video 
+                src={content.image} 
+                controls 
+                className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500 w-full max-w-[500px]"
+                data-ai-hint={content.imageHint}
+            />
+        );
+    }
+    
+    return (
+        <Image
+            src={content.image}
+            alt="Nossa História"
+            width={500}
+            height={400}
+            className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500"
+            data-ai-hint={content.imageHint}
+        />
+    );
+}
+
 function SobrePageSkeleton() {
   return (
     <div className="container mx-auto px-4 py-16 lg:py-24">
@@ -86,14 +141,7 @@ export default function SobreNosPage() {
           <p>{aboutPageContent.history2}</p>
         </div>
         <div className="flex justify-center">
-          <Image
-            src={aboutPageContent.image}
-            alt="Nossa História"
-            width={500}
-            height={400}
-            className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500"
-            data-ai-hint={aboutPageContent.imageHint}
-          />
+          {renderMedia(aboutPageContent)}
         </div>
       </div>
 
