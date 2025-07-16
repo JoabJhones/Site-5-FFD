@@ -35,14 +35,14 @@ function renderMedia(content: AboutContent) {
 
     if (youtubeEmbedUrl) {
         return (
-            <div className="aspect-w-16 aspect-h-9 w-full max-w-[500px] mx-auto">
+            <div className="aspect-video w-full">
                 <iframe
                     src={youtubeEmbedUrl}
                     title="YouTube video player"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500 w-full h-full"
+                    className="rounded-lg shadow-2xl w-full h-full"
                 ></iframe>
             </div>
         );
@@ -53,7 +53,7 @@ function renderMedia(content: AboutContent) {
             <video 
                 src={content.image} 
                 controls 
-                className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500 w-full max-w-[500px]"
+                className="rounded-lg shadow-2xl object-cover w-full"
                 data-ai-hint={content.imageHint}
             />
         );
@@ -65,7 +65,7 @@ function renderMedia(content: AboutContent) {
             alt="Nossa História"
             width={500}
             height={400}
-            className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500"
+            className="rounded-lg shadow-2xl object-cover transform hover:scale-105 transition-transform duration-500 w-full h-auto"
             data-ai-hint={content.imageHint}
         />
     );
@@ -88,7 +88,7 @@ function SobrePageSkeleton() {
           <Skeleton className="h-6 w-3/4" />
         </div>
         <div className="flex justify-center">
-          <Skeleton className="h-[400px] w-full max-w-[500px] rounded-lg" />
+          <Skeleton className="h-80 w-full rounded-lg" />
         </div>
       </div>
 
@@ -135,13 +135,13 @@ export default function SobreNosPage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-        <div className="space-y-4 text-lg text-foreground/80 leading-relaxed">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 items-center mb-16">
+        <div className="lg:col-span-1">
+          {renderMedia(aboutPageContent)}
+        </div>
+        <div className="lg:col-span-1 space-y-4 text-lg text-foreground/80 leading-relaxed">
           <p>{aboutPageContent.history1}</p>
           <p>{aboutPageContent.history2}</p>
-        </div>
-        <div className="flex justify-center">
-          {renderMedia(aboutPageContent)}
         </div>
       </div>
 
